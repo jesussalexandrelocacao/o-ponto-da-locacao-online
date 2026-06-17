@@ -1,0 +1,3480 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>O Ponto da Locação</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f4f6f8;
+      --surface: #ffffff;
+      --surface-soft: #f8fafc;
+      --text: #17202a;
+      --muted: #667085;
+      --line: #d7dde6;
+      --ink: #102033;
+      --brand: #0f766e;
+      --brand-dark: #0a4f4a;
+      --blue: #24577a;
+      --gold: #b96f18;
+      --danger: #b42318;
+      --success: #13804e;
+      --shadow: 0 14px 34px rgba(16, 32, 51, .08);
+      --radius: 8px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    button, input, select, textarea { font: inherit; }
+
+    button {
+      border: 0;
+      cursor: pointer;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      min-height: 38px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--text);
+      padding: 8px 10px;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 84px;
+    }
+
+    label {
+      display: grid;
+      gap: 5px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .app-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(244, 246, 248, .96);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .header-inner {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 16px 22px 12px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .brand-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      background: #071017;
+      flex: 0 0 auto;
+    }
+
+    .brand-logo {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 20px;
+      line-height: 1.15;
+      letter-spacing: 0;
+    }
+
+    .brand p {
+      margin: 2px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .toolbar, .btn-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .tab-button {
+      min-height: 44px;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-weight: 800;
+      box-shadow: 0 4px 14px rgba(16, 32, 51, .04);
+      text-align: center;
+    }
+
+    .tab-button.active {
+      background: var(--ink);
+      color: #fff;
+      border-color: var(--ink);
+    }
+
+    .btn {
+      min-height: 38px;
+      border-radius: 7px;
+      padding: 8px 12px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      background: #e7edf3;
+      color: #163047;
+      font-weight: 800;
+      white-space: nowrap;
+    }
+
+    .btn.primary { background: var(--brand); color: #fff; }
+    .btn.dark { background: var(--ink); color: #fff; }
+    .btn.blue { background: var(--blue); color: #fff; }
+    .btn.gold { background: var(--gold); color: #fff; }
+    .btn.danger { background: var(--danger); color: #fff; }
+    .btn.ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
+    .btn.small { min-height: 30px; padding: 6px 8px; font-size: 12px; }
+
+    .content {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 22px;
+    }
+
+    .view-title {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    .view-title h2 {
+      margin: 0;
+      font-size: 24px;
+      letter-spacing: 0;
+    }
+
+    .view-title p {
+      margin: 4px 0 0;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .grid.four { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(150px, 1fr));
+      gap: 10px;
+      align-items: end;
+    }
+
+    .wide { grid-column: span 2; }
+    .full { grid-column: 1 / -1; }
+
+    .panel, .statement-paper {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .panel { padding: 16px; }
+
+    .panel-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .panel-title h3 {
+      margin: 0;
+      font-size: 17px;
+      letter-spacing: 0;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .table-wrap {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      overflow: auto;
+      background: #fff;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 980px;
+    }
+
+    th, td {
+      border-bottom: 1px solid var(--line);
+      padding: 9px 10px;
+      text-align: left;
+      vertical-align: middle;
+    }
+
+    th {
+      background: #eef2f6;
+      color: #405064;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 24px;
+      border-radius: 999px;
+      padding: 4px 9px;
+      font-size: 12px;
+      font-weight: 800;
+      background: #edf2f7;
+      color: #344054;
+      white-space: nowrap;
+    }
+
+    .status.active, .status.ok { background: #ddf7ec; color: #087443; }
+    .status.closed { background: #eceff3; color: #475467; }
+    .status.warn { background: #fff1d6; color: #8a4b08; }
+    .status.bad { background: #ffe4e0; color: #9a2218; }
+
+    .empty {
+      border: 1px dashed #b8c2d0;
+      border-radius: 8px;
+      background: #fbfcfe;
+      color: var(--muted);
+      padding: 18px;
+      text-align: center;
+    }
+
+    .summary-strip {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .metric {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      min-height: 86px;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .metric strong {
+      display: block;
+      margin-top: 8px;
+      font-size: 22px;
+      line-height: 1.15;
+      overflow-wrap: anywhere;
+    }
+
+    .preview-box {
+      background: var(--surface-soft);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .kv-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 9px;
+    }
+
+    .kv {
+      min-height: 54px;
+      border: 1px solid #e1e6ee;
+      border-radius: 7px;
+      background: #fff;
+      padding: 8px 10px;
+    }
+
+    .kv span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .kv strong {
+      font-size: 13px;
+      line-height: 1.25;
+      overflow-wrap: anywhere;
+    }
+
+    .statement-info-grid {
+      display: grid;
+      grid-template-columns: minmax(300px, .9fr) minmax(330px, 1fr) minmax(470px, 1.3fr);
+      gap: 16px;
+      align-items: start;
+      margin: 14px 0 18px;
+    }
+
+    .statement-info-col {
+      display: grid;
+      gap: 4px;
+      min-width: 0;
+      --label-width: 118px;
+    }
+
+    .statement-info-col.info-col-left {
+      --label-width: 142px;
+    }
+
+    .statement-info-col.info-col-middle {
+      --label-width: 92px;
+    }
+
+    .statement-info-col.info-col-right {
+      --label-width: 146px;
+    }
+
+    .statement-info-row {
+      display: grid;
+      grid-template-columns: var(--label-width) minmax(0, 1fr);
+      align-items: center;
+      gap: 8px;
+      min-height: 24px;
+      color: #000;
+    }
+
+    .statement-info-row .info-label {
+      color: #8c9298;
+      font-weight: 900;
+      text-align: right;
+      min-width: 0;
+      line-height: 1.05;
+      overflow: hidden;
+    }
+
+    .statement-info-row .info-value {
+      min-width: 0;
+      color: #000;
+      font-size: 15px;
+      line-height: 1.15;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .statement-info-row .info-control {
+      width: 100%;
+      min-height: 24px;
+      padding: 1px 6px;
+      border-color: #d0d5dd;
+      border-radius: 0;
+      background: #fff;
+      color: #000;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .statement-info-row .info-control.select-tenant {
+      font-size: 13px;
+    }
+
+    .statement-info-row.strong .info-value,
+    .statement-info-row.strong .info-control {
+      font-size: 16px;
+      font-weight: 900;
+    }
+
+    .statement-info-row.split {
+      grid-template-columns: var(--label-width) minmax(54px, .9fr) 72px minmax(76px, .8fr);
+    }
+
+    .statement-info-row.split .info-label:nth-of-type(2) {
+      text-align: right;
+    }
+
+    .statement-info-spacer {
+      min-height: 24px;
+    }
+
+    .status-box {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      width: 100%;
+      border: 1px solid #d0d5dd;
+      background: #fff;
+      padding: 1px 22px 1px 7px;
+      position: relative;
+      font-size: 13px;
+    }
+
+    .status-box::after {
+      content: "";
+      position: absolute;
+      right: 7px;
+      top: 50%;
+      margin-top: -2px;
+      border-left: 4px solid transparent;
+      border-right: 4px solid transparent;
+      border-top: 5px solid #8c9298;
+    }
+
+    .statement-paper {
+      padding: 24px;
+      width: 100%;
+      max-width: 1360px;
+      margin: 0 auto;
+    }
+
+    .deposit-header {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 18px;
+      align-items: start;
+      margin-bottom: 20px;
+    }
+
+    .company-title {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .statement-logo {
+      width: 78px;
+      height: 78px;
+      border-radius: 50%;
+      object-fit: cover;
+      flex: 0 0 auto;
+      background: #071017;
+    }
+
+    .company-title-text {
+      min-width: 0;
+    }
+
+    .company-title h3 {
+      margin: 0;
+      font-size: 19px;
+    }
+
+    .company-title p {
+      margin: 3px 0 0;
+      color: var(--muted);
+    }
+
+    .deposit-box {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: #f8fafc;
+      display: grid;
+      gap: 4px;
+      font-size: 13px;
+    }
+
+    .statement-heading {
+      text-align: center;
+      border-top: 2px solid var(--ink);
+      border-bottom: 2px solid var(--ink);
+      padding: 10px;
+      margin: 14px 0;
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: 0;
+    }
+
+    .statement-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 12px;
+    }
+
+    .section-label {
+      text-align: center;
+      font-weight: 900;
+      background: var(--ink);
+      color: #fff;
+      border-radius: 6px;
+      padding: 9px;
+      margin: 18px 0 10px;
+    }
+
+    .detail-table table {
+      width: 100%;
+      min-width: 0;
+      table-layout: fixed;
+    }
+
+    .detail-table th,
+    .detail-table td {
+      padding: 6px 5px;
+      min-width: 0;
+    }
+
+    .detail-table th {
+      text-align: center;
+      white-space: normal;
+      font-size: 10px;
+      line-height: 1.15;
+    }
+
+    .detail-table input,
+    .detail-table select {
+      width: 100%;
+      min-width: 0;
+      min-height: 32px;
+      padding: 4px 5px;
+      border-radius: 5px;
+      font-size: 11px;
+    }
+
+    .detail-table input[type="date"] {
+      padding-left: 4px;
+      padding-right: 2px;
+      font-size: 10px;
+    }
+
+    .detail-table .date-cell { width: 12%; }
+    .detail-table .category-cell { width: 13%; }
+    .detail-table .description-cell { width: 18%; }
+    .detail-table .observation-cell { width: 18%; }
+    .detail-table .value-cell { width: 10%; }
+    .detail-table .payment-cell { width: 11%; }
+    .detail-table .balance-cell { width: 10%; }
+    .detail-table .action-cell { width: 8%; min-width: 0; }
+
+    .detail-table .money-cell {
+      text-align: right;
+    }
+
+    .detail-table [data-row-balance] {
+      display: block;
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .detail-table .action-cell .btn {
+      width: 30px;
+      min-height: 30px;
+      padding: 0;
+      justify-content: center;
+    }
+
+    .total-row {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto 132px;
+      align-items: center;
+      gap: 18px;
+      border-top: 2px solid var(--ink);
+      margin-top: 10px;
+      padding-top: 12px;
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    .total-row span:last-child {
+      text-align: right;
+    }
+
+    .note-box {
+      margin-top: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+      background: #fffdf8;
+      color: #3b3328;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .note-box .attention-title {
+      display: block;
+      margin-top: 12px;
+      text-align: center;
+      color: #000;
+    }
+
+    .note-box .proof-notice {
+      margin-top: 12px;
+      color: #d40000;
+      font-style: italic;
+      text-align: center;
+    }
+
+    .phones-title {
+      margin-top: 16px;
+      text-align: center;
+      font-size: 17px;
+      font-weight: 900;
+      color: #000;
+    }
+
+    .important-phones {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(250px, 310px));
+      justify-content: center;
+      column-gap: 56px;
+      row-gap: 5px;
+      margin-top: 8px;
+      font-size: 13px;
+    }
+
+    .phone-item {
+      display: grid;
+      grid-template-columns: minmax(126px, 1fr) minmax(104px, auto);
+      align-items: center;
+      gap: 12px;
+      padding: 2px 0;
+      background: transparent;
+      border: 0;
+      color: #000;
+      font-weight: 900;
+      min-width: 0;
+    }
+
+    .phone-name {
+      text-align: right;
+      min-width: 0;
+      white-space: nowrap;
+    }
+
+    .phone-number {
+      min-width: 104px;
+      text-align: left;
+    }
+
+    .toast {
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 50;
+      display: none;
+      max-width: min(420px, calc(100vw - 36px));
+      background: var(--ink);
+      color: #fff;
+      border-radius: 8px;
+      padding: 12px 14px;
+      box-shadow: var(--shadow);
+    }
+
+    .toast.show { display: block; }
+    .hidden { display: none !important; }
+    .right { text-align: right; }
+
+    @media (max-width: 1100px) {
+      .form-grid, .kv-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .summary-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .deposit-header { grid-template-columns: 1fr; }
+      .statement-controls { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 1240px) {
+      .statement-info-grid {
+        grid-template-columns: repeat(2, minmax(300px, 1fr));
+      }
+
+      .statement-info-col.info-col-right {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .brand-row, .view-title {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .tabs { grid-template-columns: 1fr; }
+      .content, .header-inner { padding-left: 14px; padding-right: 14px; }
+      .form-grid, .grid.two, .grid.three, .grid.four, .kv-grid, .summary-strip, .important-phones {
+        grid-template-columns: 1fr;
+      }
+      .statement-info-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+      .statement-info-row {
+        grid-template-columns: 124px minmax(0, 1fr);
+      }
+      .statement-info-row.split {
+        grid-template-columns: 124px minmax(0, 1fr);
+      }
+      .statement-info-row.split .info-label:nth-of-type(2) {
+        grid-column: 1;
+      }
+      .total-row {
+        grid-template-columns: 1fr;
+        text-align: right;
+      }
+
+      .wide { grid-column: auto; }
+      .statement-paper { padding: 14px; }
+    }
+
+    @page {
+      size: A4;
+      margin: 11mm;
+    }
+
+    @media print {
+      body { background: #fff; }
+      .app-header, .view-title, .no-print, .toast { display: none !important; }
+      .content { padding: 0; max-width: none; }
+      .statement-paper {
+        border: 0;
+        box-shadow: none;
+        max-width: none;
+        padding: 0;
+      }
+      .statement-paper input,
+      .statement-paper select,
+      .statement-paper textarea {
+        border: 0;
+        padding: 0;
+        min-height: auto;
+        background: transparent;
+        appearance: none;
+        color: #000;
+      }
+      .statement-paper textarea { min-height: 34px; }
+      .detail-table .action-cell { display: none; }
+      .btn { display: none !important; }
+      .panel { box-shadow: none; }
+      th {
+        background: #ececec !important;
+        color: #000 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      .section-label, .statement-heading {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+    }
+
+    /* Product polish: compact operational layout inspired by mature property-management systems. */
+    :root {
+      --bg: #eef2f5;
+      --surface-soft: #f7f9fb;
+      --muted: #5d6877;
+      --line: #d4dbe4;
+      --ink: #162434;
+      --brand: #0b6f68;
+      --brand-dark: #07524d;
+      --blue: #255f85;
+      --gold: #a86617;
+      --shadow: 0 10px 24px rgba(22, 36, 52, .07);
+    }
+
+    input, select, textarea {
+      min-height: 34px;
+      padding: 6px 8px;
+      font-size: 13px;
+      line-height: 1.25;
+    }
+
+    textarea { min-height: 70px; }
+
+    label {
+      gap: 4px;
+      font-size: 11px;
+    }
+
+    .header-inner,
+    .content {
+      max-width: 1320px;
+    }
+
+    .header-inner {
+      padding: 12px 18px 10px;
+      gap: 10px;
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+    }
+
+    .brand h1 { font-size: 19px; }
+    .brand p { font-size: 12px; }
+
+    .tab-button {
+      min-height: 38px;
+      padding: 8px 10px;
+      font-size: 13px;
+    }
+
+    .btn {
+      min-height: 34px;
+      padding: 7px 10px;
+      font-size: 13px;
+    }
+
+    .content { padding: 16px 18px 22px; }
+
+    .view-title {
+      margin-bottom: 10px;
+    }
+
+    .view-title h2 { font-size: 22px; }
+
+    .view-title p {
+      margin-top: 3px;
+      font-size: 13px;
+    }
+
+    .grid { gap: 10px; }
+
+    .form-grid {
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 8px;
+    }
+
+    .record-form {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+      align-items: end;
+    }
+
+    .form-section {
+      border: 1px solid #e2e7ee;
+      border-radius: 8px;
+      background: #fbfcfe;
+      padding: 10px;
+    }
+
+    .form-section h4 {
+      margin: 0 0 8px;
+      color: var(--ink);
+      font-size: 13px;
+      letter-spacing: 0;
+    }
+
+    .section-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(155px, 1fr));
+      gap: 8px;
+      align-items: end;
+    }
+
+    .panel { padding: 12px; }
+
+    .panel-title {
+      margin-bottom: 9px;
+    }
+
+    .panel-title h3 { font-size: 16px; }
+    .muted { font-size: 12px; }
+
+    table {
+      min-width: 0;
+      table-layout: fixed;
+    }
+
+    th, td {
+      padding: 7px 8px;
+      font-size: 12.5px;
+      overflow-wrap: anywhere;
+    }
+
+    th { font-size: 10.5px; }
+
+    .summary-strip {
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .metric {
+      padding: 10px 12px;
+      min-height: 70px;
+    }
+
+    .metric span { font-size: 10.5px; }
+    .metric strong { font-size: 19px; }
+
+    .preview-box { padding: 10px; }
+
+    .kv-grid {
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 7px;
+    }
+
+    .kv {
+      min-height: 47px;
+      padding: 7px 8px;
+    }
+
+    .kv span { font-size: 10px; }
+    .kv strong { font-size: 12px; }
+
+    .statement-paper {
+      max-width: 1360px;
+      padding: 18px;
+    }
+
+    .deposit-header {
+      grid-template-columns: minmax(0, 1fr) 300px;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .company-title h3 { font-size: 18px; }
+
+    .deposit-box {
+      padding: 9px 10px;
+      font-size: 12px;
+    }
+
+    .statement-heading {
+      padding: 8px;
+      margin: 10px 0;
+      font-size: 16px;
+    }
+
+    .statement-controls {
+      gap: 8px;
+      margin-bottom: 9px;
+    }
+
+    .statement-info-grid {
+      grid-template-columns: minmax(300px, .9fr) minmax(330px, 1fr) minmax(470px, 1.3fr);
+      gap: 14px;
+      margin-top: 12px;
+    }
+
+    .statement-info-row {
+      gap: 6px;
+      min-height: 22px;
+    }
+
+    .statement-info-row .info-value,
+    .statement-info-row .info-control {
+      font-size: 13.5px;
+    }
+
+    .statement-info-row.strong .info-value,
+    .statement-info-row.strong .info-control {
+      font-size: 15px;
+    }
+
+    .section-label {
+      padding: 8px;
+      margin: 14px 0 8px;
+      font-size: 13px;
+    }
+
+    .detail-table table {
+      min-width: 0;
+      table-layout: fixed;
+    }
+
+    .detail-table input,
+    .detail-table select {
+      min-width: 0;
+      width: 100%;
+      padding: 5px 6px;
+      font-size: 12px;
+    }
+
+    .detail-table .date-cell { width: 12%; }
+    .detail-table .category-cell { width: 13%; }
+    .detail-table .description-cell { width: 18%; }
+    .detail-table .observation-cell { width: 18%; }
+    .detail-table .value-cell { width: 10%; }
+    .detail-table .payment-cell { width: 11%; }
+    .detail-table .balance-cell { width: 10%; }
+    .detail-table .action-cell { width: 7%; min-width: 0; }
+
+    .detail-table input.date-cell,
+    .detail-table input.money-cell {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .total-row {
+      margin-top: 8px;
+      padding-top: 10px;
+      font-size: 16px;
+    }
+
+    .note-box {
+      margin-top: 14px;
+      padding: 10px;
+      font-size: 12px;
+    }
+
+    .important-phones {
+      grid-template-columns: repeat(2, minmax(250px, 310px));
+      column-gap: 52px;
+      row-gap: 4px;
+      margin-top: 10px;
+      font-size: 12px;
+    }
+
+    .phone-item { padding: 2px 0; }
+
+    @media (max-width: 1100px) {
+      .section-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .detail-table table { min-width: 0; }
+    }
+
+    @media (max-width: 1240px) {
+      .statement-info-grid {
+        grid-template-columns: repeat(2, minmax(300px, 1fr));
+      }
+
+      .statement-info-col.info-col-right {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .content, .header-inner { padding-left: 12px; padding-right: 12px; }
+      .section-grid { grid-template-columns: 1fr; }
+      .statement-info-grid { grid-template-columns: 1fr; }
+      .statement-info-col.info-col-right { grid-column: auto; }
+      .detail-table table { min-width: 0; }
+      .detail-table th,
+      .detail-table input,
+      .detail-table select,
+      .detail-table [data-row-balance] {
+        font-size: 9px;
+      }
+      .detail-table th,
+      .detail-table td {
+        padding-left: 3px;
+        padding-right: 3px;
+      }
+      .toolbar .btn, .btn-row .btn { flex: 1 1 auto; }
+    }
+
+    @media print {
+      .kv-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .detail-table table {
+        min-width: 0;
+        table-layout: fixed;
+      }
+      .detail-table input,
+      .detail-table select {
+        font-size: 9px;
+      }
+    }
+
+    /* Identidade visual: paleta inspirada no logo O Ponto. */
+    :root {
+      --bg: #071017;
+      --surface: #fff8e6;
+      --surface-soft: #f5ebcf;
+      --text: #10283a;
+      --muted: #5d604f;
+      --line: #d6caa9;
+      --ink: #112f45;
+      --brand: #e85a1d;
+      --brand-dark: #b94116;
+      --blue: #19394f;
+      --gold: #efe2b8;
+      --danger: #a7331a;
+      --success: #17654f;
+      --shadow: 0 16px 32px rgba(3, 8, 12, .16);
+    }
+
+    body {
+      background:
+        radial-gradient(circle at 50% -140px, rgba(239, 226, 184, .26), transparent 36%),
+        linear-gradient(135deg, #071017 0%, #122e43 42%, #071017 100%);
+    }
+
+    .app-header {
+      background: rgba(7, 16, 23, .96);
+      border-bottom-color: rgba(239, 226, 184, .22);
+      box-shadow: 0 10px 26px rgba(0, 0, 0, .24);
+    }
+
+    .brand-mark {
+      position: relative;
+      background: var(--brand);
+      color: #fff8e6;
+      box-shadow: inset 0 -8px 16px rgba(0, 0, 0, .18);
+    }
+
+    .brand h1,
+    .brand p {
+      color: #fff8e6;
+    }
+
+    .brand p { opacity: .78; }
+
+    .tab-button {
+      background: rgba(255, 248, 230, .08);
+      color: #fff8e6;
+      border-color: rgba(239, 226, 184, .26);
+      box-shadow: none;
+    }
+
+    .tab-button:hover {
+      background: rgba(232, 90, 29, .18);
+      border-color: rgba(232, 90, 29, .7);
+    }
+
+    .tab-button.active {
+      background: var(--brand);
+      color: #fff8e6;
+      border-color: var(--brand);
+    }
+
+    .view-title h2 { color: #fff8e6; }
+
+    .view-title p {
+      color: rgba(255, 248, 230, .72);
+    }
+
+    .panel,
+    .statement-paper,
+    .metric,
+    .kv,
+    .deposit-box,
+    .phone-item,
+    .table-wrap {
+      background: var(--surface);
+      border-color: var(--line);
+    }
+
+    .form-section,
+    .preview-box {
+      background: #fbf1d4;
+      border-color: #dfcfaa;
+    }
+
+    input,
+    select,
+    textarea {
+      background: #fffdf5;
+      border-color: #d7c7a6;
+      color: var(--text);
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: 2px solid rgba(232, 90, 29, .35);
+      border-color: var(--brand);
+    }
+
+    th,
+    .section-label,
+    .statement-heading {
+      background: var(--ink);
+      color: #fff8e6;
+    }
+
+    th {
+      border-color: #244155;
+    }
+
+    .statement-heading {
+      border-color: var(--ink);
+    }
+
+    .btn.primary,
+    .btn.gold {
+      background: var(--brand);
+      color: #fff8e6;
+    }
+
+    .btn.dark,
+    .btn.blue {
+      background: var(--ink);
+      color: #fff8e6;
+    }
+
+    .btn.ghost {
+      color: var(--ink);
+      background: rgba(255, 248, 230, .64);
+      border-color: #d7c7a6;
+    }
+
+    .app-header .btn.ghost {
+      color: #fff8e6;
+      background: rgba(255, 248, 230, .08);
+      border-color: rgba(239, 226, 184, .25);
+    }
+
+    .status.active,
+    .status.ok {
+      background: #dbeee4;
+      color: #11533d;
+    }
+
+    .status.warn {
+      background: #ffe1c9;
+      color: #9b3d13;
+    }
+
+    .toast {
+      background: var(--ink);
+      color: #fff8e6;
+      border: 1px solid rgba(239, 226, 184, .24);
+    }
+  </style>
+</head>
+<body>
+  <header class="app-header">
+    <div class="header-inner">
+      <div class="brand-row">
+        <div class="brand">
+          <div class="brand-mark"><img class="brand-logo" src="assets/logo-o-ponto-da-locacao.jpg" alt="O Ponto da Locação"></div>
+          <div>
+            <h1>O Ponto da Locação</h1>
+            <p>Gestão de imóveis, vínculos e demonstrativos.</p>
+          </div>
+        </div>
+        <div class="toolbar">
+          <button class="btn ghost" id="exportData" type="button">Exportar dados</button>
+          <label class="btn ghost">
+            Importar dados
+            <input class="hidden" id="importData" type="file" accept="application/json,.json">
+          </label>
+        </div>
+      </div>
+      <nav class="tabs" id="tabs"></nav>
+    </div>
+  </header>
+
+  <main class="content">
+    <section id="view"></section>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="assets/logo-data.js"></script>
+  <script>
+    const APP_VERSION = 2;
+    const STORAGE_KEY = "af_locacao_gestao_v2";
+    const CLOUD_CONFIG_KEY = "oponto_locacao_cloud_v1";
+    const CURRENT_YEAR = new Date().getFullYear();
+    const MONTHS = [
+      "JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO",
+      "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"
+    ];
+
+    const tabs = [
+      ["properties", "CADASTRO DE IMÓVEIS", "Imóveis, tributos, seguro e financiamento."],
+      ["tenants", "CADASTRO DE VÍNCULO LOCATÁRIO", "Locatários ativos ou encerrados vinculados aos imóveis."],
+      ["statement", "DEMONSTRATIVO DE COBRANÇA", "Cobrança mensal com saldo, impressão, PDF e WhatsApp."],
+      ["online", "ACESSO ONLINE", "Sincronização em nuvem com login e banco de dados."]
+    ];
+
+    const defaultState = {
+      version: APP_VERSION,
+      settings: {
+        company: "O Ponto da Locação",
+        slogan: "Toda mudança merece um bom começo",
+        bank: "",
+        agency: "",
+        account: "",
+        pix: "",
+        centralSeguro24h: "3004-6268 / 0800 727 8118",
+        currentTenantId: ""
+      },
+      categories: ["ALUGUEL", "CONDOMÍNIO", "TRIBUTOS", "MULTA CONDOMINIAL", "MULTA POR ATRASO", "SERVIÇOS", "COBRANÇA"],
+      descriptions: [
+        "MÊS VIGENTE",
+        "BOLETO ANTERIOR",
+        "COTA CONDOMINIAL",
+        "ENERGIA ELÉTRICA - PARTES COMUNS",
+        "ÁGUA/ESGOTO - PARTICULAR",
+        "ÁGUA/ESGOTO - PARTES COMUNS",
+        "SEGURO RESIDENCIAL"
+      ],
+      properties: [],
+      tenants: [],
+      statements: {}
+    };
+
+    let state = loadState();
+    let cloudConfig = loadCloudConfig();
+    let cloudSyncTimer = null;
+    let suppressCloudSync = false;
+    let activeTab = "properties";
+    let editing = { propertyId: null, tenantId: null };
+    let currentStatementTenantId = "";
+
+    const view = document.getElementById("view");
+    const tabsEl = document.getElementById("tabs");
+    const toast = document.getElementById("toast");
+
+    init();
+
+    function init() {
+      renderTabs();
+      bindShellActions();
+      render();
+    }
+
+    function bindShellActions() {
+      document.getElementById("exportData").addEventListener("click", exportData);
+      document.getElementById("importData").addEventListener("change", importData);
+    }
+
+    function renderTabs() {
+      const visibleTabs = isCloudLoggedIn() ? tabs : tabs.filter(([id]) => id === "online");
+      if (!isCloudLoggedIn() && activeTab !== "online") activeTab = "online";
+      tabsEl.innerHTML = visibleTabs.map(([id, label]) => `
+        <button class="tab-button ${activeTab === id ? "active" : ""}" type="button" data-tab="${id}">
+          <span>${escapeHtml(label)}</span>
+        </button>
+      `).join("");
+      tabsEl.querySelectorAll("button").forEach((button) => {
+        button.addEventListener("click", () => {
+          if (activeTab === "statement") saveStatementFromDom(currentStatementTenantId, false);
+          activeTab = button.dataset.tab;
+          render();
+        });
+      });
+    }
+
+    function render() {
+      renderTabs();
+      if (!isCloudLoggedIn() && activeTab !== "online") {
+        activeTab = "online";
+        renderTabs();
+      }
+      const renderer = {
+        properties: renderProperties,
+        tenants: renderTenants,
+        statement: renderStatement,
+        online: renderOnline
+      }[activeTab];
+      renderer();
+      document.getElementById("exportData").disabled = !isCloudLoggedIn();
+      document.getElementById("importData").disabled = !isCloudLoggedIn();
+    }
+
+    function renderTitle(tabId, actionHtml = "") {
+      const tab = tabs.find(([id]) => id === tabId);
+      return `
+        <div class="view-title">
+          <div>
+            <h2>${escapeHtml(tab[1])}</h2>
+            <p>${escapeHtml(tab[2])}</p>
+          </div>
+          <div class="btn-row">${actionHtml}</div>
+        </div>
+      `;
+    }
+
+    function renderOnline() {
+      const isLogged = isCloudLoggedIn();
+      const statusText = isLogged
+        ? `Conectado como ${cloudConfig.email || "usuário Supabase"}`
+        : cloudConfig.url && cloudConfig.anonKey
+          ? "Projeto Supabase configurado. Faça login para sincronizar."
+          : "Informe os dados do projeto Supabase para ativar a nuvem.";
+      view.innerHTML = `
+        ${renderTitle("online")}
+        <div class="summary-strip">
+          ${metric("Status da nuvem", isLogged ? "Conectado" : "Pendente")}
+          ${metric("Projeto", cloudConfig.url ? "Configurado" : "Não configurado")}
+          ${metric("Registro", cloudConfig.userId ? "Usuário autenticado" : "Sem login")}
+          ${metric("Modo local", "Sempre ativo")}
+        </div>
+        <div class="panel">
+          <div class="panel-title">
+            <h3>Conexão com Supabase</h3>
+            <span class="muted">${escapeHtml(statusText)}</span>
+          </div>
+          <form id="cloudForm" class="form-grid">
+            <label class="wide">URL do projeto Supabase
+              <input name="url" placeholder="https://seu-projeto.supabase.co" value="${attr(cloudConfig.url)}">
+            </label>
+            <label class="wide">Chave pública anon
+              <input name="anonKey" placeholder="eyJhbGciOi..." value="${attr(cloudConfig.anonKey)}">
+            </label>
+            <label>E-mail de acesso
+              <input name="email" type="email" autocomplete="username" value="${attr(cloudConfig.email)}">
+            </label>
+            <label>Senha
+              <input name="password" type="password" autocomplete="current-password" placeholder="Digite apenas para entrar">
+            </label>
+            <div class="full btn-row">
+              <button class="btn primary" type="submit">Salvar conexão</button>
+              <button class="btn blue" type="button" id="cloudLogin">Entrar</button>
+              <button class="btn ghost" type="button" id="cloudLogout" ${isLogged ? "" : "disabled"}>Sair</button>
+            </div>
+          </form>
+        </div>
+        <div class="panel" style="margin-top:14px">
+          <div class="panel-title">
+            <h3>Sincronização</h3>
+            <span class="muted">Use depois de criar a tabela com o arquivo SQL.</span>
+          </div>
+          <p class="muted">O sistema continua salvando neste computador. Quando o login estiver ativo, você pode enviar os dados atuais para a nuvem ou baixar a versão salva online.</p>
+          <div class="btn-row">
+            <button class="btn primary" type="button" id="cloudPush" ${isLogged ? "" : "disabled"}>Enviar dados para a nuvem</button>
+            <button class="btn dark" type="button" id="cloudPull" ${isLogged ? "" : "disabled"}>Baixar dados da nuvem</button>
+            <button class="btn ghost" type="button" id="cloudTest">Testar conexão</button>
+          </div>
+        </div>
+        <div class="panel" style="margin-top:14px">
+          <div class="panel-title">
+            <h3>Passo obrigatório no Supabase</h3>
+            <span class="muted">Executar uma vez</span>
+          </div>
+          <p class="muted">No painel do Supabase, abra SQL Editor e execute o arquivo <strong>supabase/schema.sql</strong>. Depois crie um usuário em Authentication ou use um usuário já cadastrado.</p>
+        </div>
+      `;
+      bindOnlineEvents();
+    }
+
+    function renderProperties() {
+      const item = state.properties.find((property) => property.id === editing.propertyId) || {};
+      const activeProperties = state.properties.filter((property) => String(property.situacao || "").toLowerCase() !== "inativo").length;
+      const financedTotal = state.properties.reduce((sum, property) => sum + toNumber(property.valorParcelas), 0);
+      const insuranceTotal = state.properties.reduce((sum, property) => sum + toNumber(property.valorSeguro), 0);
+      view.innerHTML = `
+        ${renderTitle("properties", editing.propertyId ? `<button class="btn ghost" type="button" id="newProperty">Novo imóvel</button>` : "")}
+        <div class="summary-strip">
+          ${metric("Imóveis cadastrados", state.properties.length)}
+          ${metric("Imóveis ativos", activeProperties)}
+          ${metric("Parcelas financiadas", money(financedTotal))}
+          ${metric("Seguros totais", money(insuranceTotal))}
+        </div>
+        <div class="panel">
+          <div class="panel-title">
+            <h3>${editing.propertyId ? "Editar imóvel" : "Novo imóvel"}</h3>
+            <span class="muted">IPTU, CBMERJ e seguro alimentam o demonstrativo.</span>
+          </div>
+          <form id="propertyForm" class="record-form">
+            ${propertyFields(item)}
+            <div class="full btn-row">
+              <button class="btn primary" type="submit">${editing.propertyId ? "Salvar alterações" : "Cadastrar imóvel"}</button>
+              ${editing.propertyId ? `<button class="btn ghost" type="button" id="cancelPropertyEdit">Cancelar</button>` : ""}
+            </div>
+          </form>
+        </div>
+        <div class="panel" style="margin-top:14px">
+          <div class="panel-title">
+            <h3>Imóveis cadastrados</h3>
+            <span class="muted">${state.properties.length} registros</span>
+          </div>
+          ${propertyTable()}
+        </div>
+      `;
+      document.getElementById("propertyForm").addEventListener("submit", submitProperty);
+      document.getElementById("newProperty")?.addEventListener("click", () => { editing.propertyId = null; renderProperties(); });
+      document.getElementById("cancelPropertyEdit")?.addEventListener("click", () => { editing.propertyId = null; renderProperties(); });
+      bindRowActions();
+    }
+
+    function propertyFields(item = {}) {
+      return `
+        <div class="form-section full">
+          <h4>Identificação e endereço</h4>
+          <div class="section-grid">
+            <label>ID do imóvel<input name="id" required value="${attr(item.id)}" ${editing.propertyId ? "readonly" : ""}></label>
+            <label>Registro prefeitura<input name="registroPrefeitura" value="${attr(item.registroPrefeitura)}"></label>
+            <label>Situação
+              <select name="situacao">${options(["Ativo", "Inativo", "Em manutenção"], item.situacao || "Ativo")}</select>
+            </label>
+            <label class="wide">Empreendimento<input name="empreendimento" value="${attr(item.empreendimento)}"></label>
+            <label class="wide">Endereço<input name="endereco" value="${attr(item.endereco)}"></label>
+            <label>Bairro<input name="bairro" value="${attr(item.bairro)}"></label>
+            <label>Cidade<input name="cidade" value="${attr(item.cidade)}"></label>
+            <label>UF<input name="uf" maxlength="2" value="${attr(item.uf || "RJ")}"></label>
+          </div>
+        </div>
+        <div class="form-section full">
+          <h4>Financiamento e obrigações anuais</h4>
+          <div class="section-grid">
+            <label>Banco financiador<input name="bancoFinanciador" value="${attr(item.bancoFinanciador)}"></label>
+            <label>Valor das parcelas<input name="valorParcelas" type="number" min="0" step="0.01" value="${numAttr(item.valorParcelas)}"></label>
+            <label>Vencimento<input name="dataVencimento" value="${attr(item.dataVencimento)}" placeholder="Dia ou data"></label>
+            <label>IPTU vigente<input name="iptuValor" value="${attr(item.iptuValor)}" placeholder="Ex: 709,60 ou ISENTO"></label>
+            <label>Status IPTU<input name="iptuStatus" value="${attr(item.iptuStatus)}" placeholder="Quitado, parcelado..."></label>
+            <label>Código CBMERJ<input name="codigoCbmerj" value="${attr(item.codigoCbmerj)}"></label>
+            <label>Taxa CBMERJ<input name="taxaCbmerj" type="number" min="0" step="0.01" value="${numAttr(item.taxaCbmerj)}"></label>
+            <label>Status CBMERJ<input name="cbmerjStatus" value="${attr(item.cbmerjStatus)}"></label>
+          </div>
+        </div>
+        <div class="form-section full">
+          <h4>Seguro residencial</h4>
+          <div class="section-grid">
+            <label>Apólice<input name="apoliceSeguro" value="${attr(item.apoliceSeguro)}"></label>
+            <label>Seguradora<input name="nomeSeguradora" value="${attr(item.nomeSeguradora)}"></label>
+            <label>Telefone seguradora<input name="telefoneSeguradora" value="${attr(item.telefoneSeguradora)}"></label>
+            <label>Vigência<input name="vigenciaSeguro" type="date" value="${attr(item.vigenciaSeguro)}"></label>
+            <label>Valor total<input name="valorSeguro" type="number" min="0" step="0.01" value="${numAttr(item.valorSeguro)}"></label>
+            <label>Parcelas<input name="parcelasSeguro" type="number" min="0" step="1" value="${numAttr(item.parcelasSeguro)}"></label>
+            <label>Venc. parcela<input name="vencParcelaSeguro" value="${attr(item.vencParcelaSeguro)}"></label>
+            <label>Situação seguro<input name="situacaoSeguro" value="${attr(item.situacaoSeguro)}"></label>
+          </div>
+        </div>
+      `;
+    }
+
+    function submitProperty(event) {
+      event.preventDefault();
+      const form = new FormData(event.currentTarget);
+      const id = String(form.get("id") || "").trim();
+      if (!id) return showToast("Informe o ID do imóvel.");
+      const duplicate = state.properties.some((property) => property.id === id && property.id !== editing.propertyId);
+      if (duplicate) return showToast("Já existe imóvel com esse ID.");
+      const property = {
+        id,
+        registroPrefeitura: value(form, "registroPrefeitura"),
+        bancoFinanciador: value(form, "bancoFinanciador"),
+        valorParcelas: toNumber(form.get("valorParcelas")),
+        dataVencimento: value(form, "dataVencimento"),
+        empreendimento: value(form, "empreendimento"),
+        endereco: value(form, "endereco"),
+        bairro: value(form, "bairro"),
+        cidade: value(form, "cidade"),
+        uf: value(form, "uf").toUpperCase(),
+        iptuValor: value(form, "iptuValor"),
+        iptuStatus: value(form, "iptuStatus"),
+        codigoCbmerj: value(form, "codigoCbmerj"),
+        taxaCbmerj: toNumber(form.get("taxaCbmerj")),
+        cbmerjStatus: value(form, "cbmerjStatus"),
+        apoliceSeguro: value(form, "apoliceSeguro"),
+        nomeSeguradora: value(form, "nomeSeguradora"),
+        telefoneSeguradora: value(form, "telefoneSeguradora"),
+        vigenciaSeguro: value(form, "vigenciaSeguro"),
+        valorSeguro: toNumber(form.get("valorSeguro")),
+        parcelasSeguro: value(form, "parcelasSeguro"),
+        vencParcelaSeguro: value(form, "vencParcelaSeguro"),
+        situacaoSeguro: value(form, "situacaoSeguro"),
+        situacao: value(form, "situacao")
+      };
+      const index = state.properties.findIndex((item) => item.id === editing.propertyId);
+      if (index >= 0) state.properties[index] = property;
+      else state.properties.push(property);
+      editing.propertyId = null;
+      save();
+      renderProperties();
+      showToast("Imóvel salvo.");
+    }
+
+    function propertyTable() {
+      if (!state.properties.length) return empty("Nenhum imóvel cadastrado.");
+      return `
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th><th>Empreendimento</th><th>Endereço</th><th>IPTU ${CURRENT_YEAR}</th>
+                <th>CBMERJ</th><th>Seguro</th><th>Situação</th><th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${state.properties.map((property) => `
+                <tr>
+                  <td><strong>${escapeHtml(property.id)}</strong></td>
+                  <td>${escapeHtml(property.empreendimento || "")}</td>
+                  <td>${escapeHtml(compactAddress(property))}</td>
+                  <td>${escapeHtml(formatLooseMoney(property.iptuValor))}<br><span class="muted">${escapeHtml(property.iptuStatus || "")}</span></td>
+                  <td>${money(toNumber(property.taxaCbmerj))}<br><span class="muted">${escapeHtml(property.cbmerjStatus || "")}</span></td>
+                  <td>${escapeHtml(property.apoliceSeguro || "")}<br><span class="muted">${escapeHtml(property.situacaoSeguro || "")}</span></td>
+                  <td>${statusPill(property.situacao || "Ativo")}</td>
+                  <td>
+                    <div class="btn-row">
+                      <button class="btn small ghost" type="button" data-action="edit-property" data-id="${attr(property.id)}">Editar</button>
+                      <button class="btn small danger" type="button" data-action="delete-property" data-id="${attr(property.id)}">Excluir</button>
+                    </div>
+                  </td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderTenants() {
+      const item = state.tenants.find((tenant) => tenant.id === editing.tenantId) || {};
+      const selectedProperty = findProperty(item.propertyId || state.properties[0]?.id);
+      const activeCount = activeTenants().length;
+      const rentTotal = activeTenants().reduce((sum, tenant) => sum + toNumber(tenant.valorAluguel), 0);
+      view.innerHTML = `
+        ${renderTitle("tenants", editing.tenantId ? `<button class="btn ghost" type="button" id="newTenant">Novo vínculo</button>` : "")}
+        <div class="summary-strip">
+          ${metric("Vínculos cadastrados", state.tenants.length)}
+          ${metric("Locações ativas", activeCount)}
+          ${metric("Aluguel ativo mensal", money(rentTotal))}
+          ${metric("Imóveis disponíveis", state.properties.length)}
+        </div>
+        <div class="panel">
+          <div class="panel-title">
+            <h3>${editing.tenantId ? "Editar vínculo" : "Novo vínculo locatário"}</h3>
+            <span class="muted">Ao escolher o imóvel, os dados aparecem abaixo.</span>
+          </div>
+          <form id="tenantForm" class="record-form">
+            ${tenantFields(item)}
+            <div class="full preview-box" id="propertyPreview">
+              ${propertyPreview(selectedProperty)}
+            </div>
+            <div class="full btn-row">
+              <button class="btn primary" type="submit">${editing.tenantId ? "Salvar alterações" : "Cadastrar vínculo"}</button>
+              ${editing.tenantId ? `<button class="btn ghost" type="button" id="cancelTenantEdit">Cancelar</button>` : ""}
+            </div>
+          </form>
+        </div>
+        <div class="panel" style="margin-top:14px">
+          <div class="panel-title">
+            <h3>Vínculos locatários</h3>
+            <span class="muted">${activeCount} ativos</span>
+          </div>
+          ${tenantTable()}
+        </div>
+      `;
+      document.getElementById("tenantForm").addEventListener("submit", submitTenant);
+      document.querySelector("[name='propertyId']").addEventListener("change", (event) => {
+        document.getElementById("propertyPreview").innerHTML = propertyPreview(findProperty(event.target.value));
+        const renewal = document.querySelector("[name='renovacaoSeguro']");
+        const property = findProperty(event.target.value);
+        if (property && !renewal.value) renewal.value = property.vigenciaSeguro || "";
+      });
+      document.getElementById("newTenant")?.addEventListener("click", () => { editing.tenantId = null; renderTenants(); });
+      document.getElementById("cancelTenantEdit")?.addEventListener("click", () => { editing.tenantId = null; renderTenants(); });
+      bindRowActions();
+    }
+
+    function tenantFields(item = {}) {
+      return `
+        <div class="form-section full">
+          <h4>Locatário</h4>
+          <div class="section-grid">
+            <label>ID do locatário<input name="id" required value="${attr(item.id)}" ${editing.tenantId ? "readonly" : ""}></label>
+            <label>Status da locação
+              <select name="status">${options(["ATIVO", "ENCERRADO", "SUSPENSO"], item.status || "ATIVO")}</select>
+            </label>
+            <label class="wide">Nome do locatário<input name="nome" required value="${attr(item.nome)}"></label>
+            <label>E-mail<input name="email" type="email" value="${attr(item.email)}"></label>
+            <label>Telefone<input name="telefone" value="${attr(item.telefone)}"></label>
+          </div>
+        </div>
+        <div class="form-section full">
+          <h4>Contrato e imóvel vinculado</h4>
+          <div class="section-grid">
+            <label>ID do imóvel
+              <select name="propertyId" required>${propertyOptions(item.propertyId)}</select>
+            </label>
+            <label>Vigência do contrato<input name="vigenciaContrato" type="date" value="${attr(item.vigenciaContrato)}"></label>
+            <label>Plano
+              <input name="plano" list="planos" value="${attr(item.plano || "36 meses")}">
+              <datalist id="planos">
+                <option value="12 meses"></option>
+                <option value="18 meses"></option>
+                <option value="36 meses"></option>
+              </datalist>
+            </label>
+            <label>Valor do aluguel<input name="valorAluguel" type="number" min="0" step="0.01" value="${numAttr(item.valorAluguel)}"></label>
+            <label>Data de reajuste<input name="dataReajuste" value="${attr(item.dataReajuste)}" placeholder="Ex: 01/03/2027"></label>
+            <label>Renovação do seguro<input name="renovacaoSeguro" type="date" value="${attr(item.renovacaoSeguro)}"></label>
+          </div>
+        </div>
+      `;
+    }
+
+    function submitTenant(event) {
+      event.preventDefault();
+      const form = new FormData(event.currentTarget);
+      const id = String(form.get("id") || "").trim();
+      const property = findProperty(value(form, "propertyId"));
+      if (!id) return showToast("Informe o ID do locatário.");
+      if (!property) return showToast("Selecione um imóvel cadastrado.");
+      const duplicate = state.tenants.some((tenant) => tenant.id === id && tenant.id !== editing.tenantId);
+      if (duplicate) return showToast("Já existe locatário com esse ID.");
+      const tenant = {
+        id,
+        status: value(form, "status"),
+        nome: value(form, "nome"),
+        email: value(form, "email"),
+        telefone: value(form, "telefone"),
+        propertyId: value(form, "propertyId"),
+        vigenciaContrato: value(form, "vigenciaContrato"),
+        plano: value(form, "plano"),
+        valorAluguel: toNumber(form.get("valorAluguel")),
+        dataReajuste: value(form, "dataReajuste"),
+        renovacaoSeguro: value(form, "renovacaoSeguro") || property.vigenciaSeguro || ""
+      };
+      const index = state.tenants.findIndex((item) => item.id === editing.tenantId);
+      if (index >= 0) state.tenants[index] = tenant;
+      else state.tenants.push(tenant);
+      editing.tenantId = null;
+      save();
+      renderTenants();
+      showToast("Vínculo locatário salvo.");
+    }
+
+    function tenantTable() {
+      if (!state.tenants.length) return empty("Nenhum vínculo cadastrado.");
+      return `
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th><th>Status</th><th>Locatário</th><th>Contato</th><th>Imóvel</th>
+                <th>Contrato</th><th>Aluguel</th><th>Seguro</th><th>Ações</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${state.tenants.map((tenant) => {
+                const property = findProperty(tenant.propertyId);
+                return `
+                  <tr>
+                    <td><strong>${escapeHtml(tenant.id)}</strong></td>
+                    <td>${statusPill(tenant.status)}</td>
+                    <td>${escapeHtml(tenant.nome || "")}</td>
+                    <td>${escapeHtml(tenant.telefone || "")}<br><span class="muted">${escapeHtml(tenant.email || "")}</span></td>
+                    <td>${escapeHtml(tenant.propertyId || "")}<br><span class="muted">${escapeHtml(property?.empreendimento || "")}</span></td>
+                    <td>${escapeHtml(tenant.plano || "")}<br><span class="muted">${formatDate(tenant.vigenciaContrato)}</span></td>
+                    <td>${money(toNumber(tenant.valorAluguel))}</td>
+                    <td>${formatDate(tenant.renovacaoSeguro || property?.vigenciaSeguro)}<br><span class="muted">${escapeHtml(property?.situacaoSeguro || "")}</span></td>
+                    <td>
+                      <div class="btn-row">
+                        <button class="btn small ghost" type="button" data-action="edit-tenant" data-id="${attr(tenant.id)}">Editar</button>
+                        <button class="btn small danger" type="button" data-action="delete-tenant" data-id="${attr(tenant.id)}">Excluir</button>
+                      </div>
+                    </td>
+                  </tr>
+                `;
+              }).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    function renderStatement() {
+      const active = activeTenants();
+      const tenantId = active.some((tenant) => tenant.id === state.settings.currentTenantId)
+        ? state.settings.currentTenantId
+        : active[0]?.id || "";
+      state.settings.currentTenantId = tenantId;
+      currentStatementTenantId = tenantId;
+      const tenant = findTenant(tenantId);
+      const statement = getStatement(tenant);
+      const snapshot = tenant ? tenantSnapshot(tenant) : null;
+      view.innerHTML = `
+        ${renderTitle("statement")}
+        <div class="panel no-print" style="margin-bottom:14px">
+          <div class="panel-title">
+            <h3>Dados de depósito</h3>
+            <span class="muted">Esses dados saem centralizados no demonstrativo.</span>
+          </div>
+          <form id="settingsForm" class="form-grid">
+            <label>Banco<input name="bank" value="${attr(state.settings.bank)}"></label>
+            <label>Agência<input name="agency" value="${attr(state.settings.agency)}"></label>
+            <label>Conta corrente<input name="account" value="${attr(state.settings.account)}"></label>
+            <label>Chave Pix<input name="pix" value="${attr(state.settings.pix)}"></label>
+            <label class="wide">Central Seguro 24h<input name="centralSeguro24h" value="${attr(state.settings.centralSeguro24h)}"></label>
+            <label>Nome/assinatura<input name="company" value="${attr(state.settings.company)}"></label>
+            <label>Slogan<input name="slogan" value="${attr(state.settings.slogan)}"></label>
+            <div class="full btn-row"><button class="btn primary" type="submit">Salvar dados de depósito</button></div>
+          </form>
+        </div>
+        ${tenant ? statementPaper(tenant, snapshot, statement) : empty("Cadastre um vínculo locatário ativo para emitir o demonstrativo.")}
+      `;
+      if (!tenant) return;
+      bindStatementEvents();
+      updateRowTotals();
+    }
+
+    function statementPaper(tenant, snapshot, statement) {
+      const updated = statement.updatedAt ? `Último salvamento: ${formatDateTime(statement.updatedAt)}` : "Ainda não salvo para este locatário.";
+      return `
+        <form id="statementForm">
+          <div class="statement-paper" id="statementPaper">
+            <div class="deposit-header">
+              <div class="company-title">
+                <img class="statement-logo" src="assets/logo-o-ponto-da-locacao.jpg" alt="O Ponto da Locação">
+                <div class="company-title-text">
+                  <h3>${escapeHtml(state.settings.company)}</h3>
+                  <p>${escapeHtml(state.settings.slogan)}</p>
+                </div>
+              </div>
+              <div class="deposit-box">
+                <strong>Dados de depósito</strong>
+                <span>Banco: ${escapeHtml(state.settings.bank || "")}</span>
+                <span>Agência: ${escapeHtml(state.settings.agency || "")}</span>
+                <span>Conta Corrente: ${escapeHtml(state.settings.account || "")}</span>
+                <span>Pix: ${escapeHtml(state.settings.pix || "")}</span>
+              </div>
+            </div>
+
+            <div class="statement-heading">DEMONSTRATIVO DE COBRANÇA - <input name="referenceYear" type="number" min="2000" max="2100" value="${attr(statement.referenceYear || CURRENT_YEAR)}" style="width:86px;display:inline-block;text-align:center;font-weight:900"></div>
+
+            ${statementInfoGrid(tenant, snapshot, statement)}
+
+            <div class="section-label">DETALHAMENTO DO MÊS</div>
+
+            <div class="btn-row no-print" style="margin-bottom:10px">
+              <button class="btn ghost" type="button" id="addDetailRow">Adicionar linha</button>
+              <button class="btn ghost" type="button" id="addCategory">Nova categoria</button>
+              <button class="btn ghost" type="button" id="addDescription">Nova descrição</button>
+            </div>
+
+            <div class="table-wrap detail-table">
+              <table>
+                <colgroup>
+                  <col class="date-cell">
+                  <col class="category-cell">
+                  <col class="description-cell">
+                  <col class="observation-cell">
+                  <col class="value-cell">
+                  <col class="payment-cell">
+                  <col class="balance-cell">
+                  <col class="action-cell no-print">
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th class="date-cell">Data</th>
+                    <th class="category-cell">Categoria</th>
+                    <th class="description-cell">Descrição</th>
+                    <th class="observation-cell">Observação</th>
+                    <th class="value-cell">Valor</th>
+                    <th class="payment-cell">Pagamento</th>
+                    <th class="balance-cell">Saldo</th>
+                    <th class="action-cell no-print"></th>
+                  </tr>
+                </thead>
+                <tbody id="detailBody">
+                  ${(statement.rows || []).map(detailRow).join("")}
+                </tbody>
+              </table>
+            </div>
+
+            <div class="total-row">
+              <span>TOTAL A DEPOSITAR:</span>
+              <span id="totalToDeposit">R$ 0,00</span>
+            </div>
+
+            <label class="no-print" style="margin-top:14px">Observações do demonstrativo
+              <textarea name="notes">${escapeHtml(statement.notes || "")}</textarea>
+            </label>
+
+            <div class="note-box">
+              <strong>OBSERVAÇÕES:</strong>
+              <div id="printNotes">${escapeHtml(statement.notes || "")}</div>
+              <strong class="attention-title">ATENÇÃO!</strong>
+              <p>O não pagamento até o prazo estipulado caracteriza infração contratual grave, nos termos da Cláusula 26.1 e do art. 9, inciso III, da Lei n. 8.245/91 (Lei do Inquilinato).</p>
+              <p class="proof-notice">Após realizar a transação de depósito/transferência, solicitamos que envie o comprovante no grupo de WhatsApp de sua locação.</p>
+            </div>
+
+            <div class="phones-title">TELEFONES IMPORTANTES:</div>
+            <div class="important-phones">
+              ${phoneItem("CEG", "0800 024 7766")}
+              ${phoneItem("LIGHT", "0800 282 0120")}
+              ${phoneItem("CEDAE", "0800 282 1195")}
+              ${phoneItem("Polícia Militar", "190")}
+              ${phoneItem("Bombeiros", "193")}
+              ${phoneItem("Defesa Civil", "199")}
+            </div>
+          </div>
+
+          <div class="panel no-print" style="margin-top:14px">
+            <div class="panel-title">
+              <h3>Ações do demonstrativo</h3>
+              <span class="muted">${escapeHtml(updated)}</span>
+            </div>
+            <div class="btn-row">
+              <button class="btn primary" type="button" id="saveStatement">Salvar demonstrativo</button>
+              <button class="btn dark" type="button" id="printStatement">Imprimir</button>
+              <button class="btn blue" type="button" id="downloadPdf">Baixar PDF</button>
+              <button class="btn gold" type="button" id="sendWhatsapp">Enviar WhatsApp</button>
+            </div>
+          </div>
+        </form>
+      `;
+    }
+
+    function statementInfoGrid(tenant, snapshot, statement) {
+      const monthControl = `<select class="info-control" name="month">${options(MONTHS, statement.month || MONTHS[new Date().getMonth()])}</select>`;
+      const dueControl = `<input class="info-control" name="dueDate" type="date" value="${attr(statement.dueDate)}">`;
+      const tenantControl = `<select class="info-control select-tenant" name="tenantId">${activeTenants().map((item) => `<option value="${attr(item.id)}" ${item.id === tenant.id ? "selected" : ""}>${escapeHtml(item.id)} - ${escapeHtml(item.nome)}</option>`).join("")}</select>`;
+      const cityUf = `${snapshot.cidade || ""}/${snapshot.uf || ""}`;
+      return `
+        <div class="statement-info-grid">
+          <div class="statement-info-col info-col-left">
+            ${infoControlRow("Mês de Referência:", monthControl, "strong")}
+            ${infoControlRow("Vencimento:", dueControl, "strong")}
+            ${infoControlRow("Id. / Locatário:", tenantControl)}
+            ${infoRow("Cel.:", snapshot.telefone)}
+            ${infoRow("Valor do Aluguel:", money(toNumber(snapshot.valorAluguel)))}
+            <div class="statement-info-spacer"></div>
+            ${infoRow("Renov. Seguro:", formatDate(snapshot.renovacaoSeguro))}
+            ${infoRow("Valor do Seguro:", money(toNumber(snapshot.valorSeguro)))}
+          </div>
+          <div class="statement-info-col info-col-middle">
+            <div class="statement-info-spacer"></div>
+            <div class="statement-info-spacer"></div>
+            ${infoRow("Nome:", snapshot.nome)}
+            ${infoRow("E-mail:", snapshot.email)}
+            ${splitInfoRow("Plano:", snapshot.plano, "Vigência:", formatDate(snapshot.vigenciaContrato))}
+            ${infoRow("Reaj.:", snapshot.dataReajuste)}
+            ${infoRow("Apólice:", snapshot.apoliceSeguro)}
+            ${infoRow("Status:", statusBox(snapshot.situacaoSeguro), "raw")}
+          </div>
+          <div class="statement-info-col info-col-right">
+            <div class="statement-info-spacer"></div>
+            ${infoRow("Empreendimento:", snapshot.empreendimento)}
+            ${infoRow("End.:", snapshot.endereco)}
+            ${infoRow("Bairro:", snapshot.bairro)}
+            ${infoRow("Cidade/UF:", cityUf)}
+            ${splitInfoRow(`IPTU-${CURRENT_YEAR}:`, formatLooseMoney(snapshot.iptuValor), "Status:", statusBox(snapshot.iptuStatus), "raw-second")}
+            ${splitInfoRow("Taxa de Incêndio:", money(toNumber(snapshot.taxaCbmerj)), "Status:", statusBox(snapshot.cbmerjStatus), "raw-second")}
+            ${infoRow("Central Seguro 24h:", state.settings.centralSeguro24h || snapshot.telefoneSeguradora)}
+          </div>
+        </div>
+      `;
+    }
+
+    function infoRow(label, value, mode = "") {
+      const content = mode === "raw" ? value : escapeHtml(value || "-");
+      return `<div class="statement-info-row"><span class="info-label">${escapeHtml(label)}</span><span class="info-value">${content}</span></div>`;
+    }
+
+    function infoControlRow(label, control, className = "") {
+      return `<div class="statement-info-row ${className}"><span class="info-label">${escapeHtml(label)}</span>${control}</div>`;
+    }
+
+    function splitInfoRow(leftLabel, leftValue, rightLabel, rightValue, mode = "") {
+      const left = escapeHtml(leftValue || "-");
+      const right = mode === "raw-second" ? rightValue : escapeHtml(rightValue || "-");
+      return `<div class="statement-info-row split"><span class="info-label">${escapeHtml(leftLabel)}</span><span class="info-value">${left}</span><span class="info-label">${escapeHtml(rightLabel)}</span><span class="info-value">${right}</span></div>`;
+    }
+
+    function statusBox(value) {
+      return `<span class="status-box">${escapeHtml(value || "-")}</span>`;
+    }
+
+    function bindStatementEvents() {
+      document.getElementById("settingsForm").addEventListener("submit", submitSettings);
+      const form = document.getElementById("statementForm");
+      form.elements.tenantId.addEventListener("change", (event) => {
+        saveStatementFromDom(currentStatementTenantId, false);
+        state.settings.currentTenantId = event.target.value;
+        save();
+        renderStatement();
+      });
+      form.addEventListener("input", (event) => {
+        if (event.target.matches("[data-detail-field]")) updateRowTotals();
+        if (event.target.name === "notes") {
+          document.getElementById("printNotes").textContent = event.target.value;
+        }
+      });
+      document.getElementById("addDetailRow").addEventListener("click", addDetailRow);
+      document.getElementById("addCategory").addEventListener("click", addCategory);
+      document.getElementById("addDescription").addEventListener("click", addDescription);
+      document.getElementById("saveStatement").addEventListener("click", () => {
+        saveStatementFromDom(currentStatementTenantId, true);
+      });
+      document.getElementById("printStatement").addEventListener("click", printStatementPdf);
+      document.getElementById("downloadPdf").addEventListener("click", downloadStatementPdf);
+      document.getElementById("sendWhatsapp").addEventListener("click", sendWhatsapp);
+      document.querySelectorAll("[data-action='remove-detail']").forEach((button) => {
+        button.addEventListener("click", () => removeDetailRow(Number(button.dataset.index)));
+      });
+    }
+
+    function submitSettings(event) {
+      event.preventDefault();
+      saveStatementFromDom(currentStatementTenantId, false);
+      const form = new FormData(event.currentTarget);
+      state.settings = {
+        ...state.settings,
+        bank: value(form, "bank"),
+        agency: value(form, "agency"),
+        account: value(form, "account"),
+        pix: value(form, "pix"),
+        centralSeguro24h: value(form, "centralSeguro24h"),
+        company: value(form, "company"),
+        slogan: value(form, "slogan")
+      };
+      save();
+      renderStatement();
+      showToast("Dados de depósito salvos.");
+    }
+
+    function detailRow(row = {}, index) {
+      return `
+        <tr data-row="${index}">
+          <td><input class="date-cell" data-detail-field="date" type="date" value="${attr(row.date)}"></td>
+          <td><select data-detail-field="category">${options(withCurrent(state.categories, row.category), row.category || "ALUGUEL")}</select></td>
+          <td><select data-detail-field="description">${options(withCurrent(state.descriptions, row.description), row.description || "MÊS VIGENTE")}</select></td>
+          <td><input data-detail-field="observation" value="${attr(row.observation)}"></td>
+          <td><input class="money-cell" data-detail-field="value" type="number" step="0.01" value="${numAttr(row.value)}"></td>
+          <td><input class="money-cell" data-detail-field="payment" type="number" step="0.01" value="${numAttr(row.payment)}"></td>
+          <td class="right"><strong data-row-balance>${money(rowBalance(row))}</strong></td>
+          <td class="action-cell no-print"><button class="btn small danger" type="button" data-action="remove-detail" data-index="${index}" title="Remover linha" aria-label="Remover linha">X</button></td>
+        </tr>
+      `;
+    }
+
+    function saveStatementFromDom(tenantIdOverride = "", notify = false) {
+      const form = document.getElementById("statementForm");
+      if (!form) return null;
+      const tenantId = tenantIdOverride || form.elements.tenantId.value;
+      const rows = Array.from(document.querySelectorAll("#detailBody tr")).map((tr) => {
+        const data = {};
+        tr.querySelectorAll("[data-detail-field]").forEach((field) => {
+          data[field.dataset.detailField] = field.value;
+        });
+        return {
+          date: data.date || "",
+          category: data.category || "",
+          description: data.description || "",
+          observation: data.observation || "",
+          value: data.value === "" ? "" : toNumber(data.value),
+          payment: data.payment === "" ? "" : toNumber(data.payment)
+        };
+      }).filter((row) => row.date || row.category || row.description || row.observation || row.value !== "" || row.payment !== "");
+
+      rows.forEach((row) => {
+        if (row.category) addUnique(state.categories, row.category);
+        if (row.description) addUnique(state.descriptions, row.description);
+      });
+
+      const statement = {
+        tenantId,
+        month: form.elements.month.value,
+        referenceYear: form.elements.referenceYear.value || String(CURRENT_YEAR),
+        dueDate: form.elements.dueDate.value,
+        notes: form.elements.notes?.value || "",
+        rows: rows.length ? rows : [defaultDetailRow(findTenant(tenantId))],
+        updatedAt: new Date().toISOString()
+      };
+      state.statements[tenantId] = statement;
+      state.settings.currentTenantId = tenantId;
+      save();
+      if (notify) {
+        showToast("Demonstrativo salvo para " + tenantId + ".");
+        renderStatement();
+      }
+      return statement;
+    }
+
+    function addDetailRow() {
+      const statement = saveStatementFromDom(currentStatementTenantId, false);
+      if (!statement) return;
+      statement.rows.push({ date: "", category: "ALUGUEL", description: "MÊS VIGENTE", observation: "", value: "", payment: "" });
+      state.statements[statement.tenantId] = statement;
+      save();
+      renderStatement();
+    }
+
+    function removeDetailRow(index) {
+      const statement = saveStatementFromDom(currentStatementTenantId, false);
+      if (!statement) return;
+      statement.rows.splice(index, 1);
+      if (!statement.rows.length) statement.rows.push(defaultDetailRow(findTenant(statement.tenantId)));
+      state.statements[statement.tenantId] = statement;
+      save();
+      renderStatement();
+    }
+
+    function addCategory() {
+      const name = prompt("Nova categoria");
+      if (!name) return;
+      addUnique(state.categories, name.trim().toUpperCase());
+      saveStatementFromDom(currentStatementTenantId, false);
+      save();
+      renderStatement();
+    }
+
+    function addDescription() {
+      const name = prompt("Nova descrição");
+      if (!name) return;
+      addUnique(state.descriptions, name.trim().toUpperCase());
+      saveStatementFromDom(currentStatementTenantId, false);
+      save();
+      renderStatement();
+    }
+
+    function updateRowTotals() {
+      const rows = Array.from(document.querySelectorAll("#detailBody tr"));
+      let total = 0;
+      rows.forEach((tr) => {
+        const valueInput = tr.querySelector("[data-detail-field='value']");
+        const paymentInput = tr.querySelector("[data-detail-field='payment']");
+        const balance = toNumber(valueInput?.value) - toNumber(paymentInput?.value);
+        total += balance;
+        const balanceEl = tr.querySelector("[data-row-balance]");
+        if (balanceEl) balanceEl.textContent = money(balance);
+      });
+      const totalEl = document.getElementById("totalToDeposit");
+      if (totalEl) totalEl.textContent = money(total);
+    }
+
+    function getStatement(tenant) {
+      if (!tenant) return {};
+      const saved = state.statements[tenant.id];
+      if (saved) {
+        return {
+          ...saved,
+          rows: Array.isArray(saved.rows) && saved.rows.length ? saved.rows : [defaultDetailRow(tenant)]
+        };
+      }
+      return {
+        tenantId: tenant.id,
+        month: MONTHS[new Date().getMonth()],
+        referenceYear: String(CURRENT_YEAR),
+        dueDate: "",
+        notes: "",
+        rows: [defaultDetailRow(tenant)],
+        updatedAt: ""
+      };
+    }
+
+    function defaultDetailRow(tenant) {
+      return {
+        date: "",
+        category: "ALUGUEL",
+        description: "MÊS VIGENTE",
+        observation: `${MONTHS[new Date().getMonth()]}/${CURRENT_YEAR}`,
+        value: tenant ? toNumber(tenant.valorAluguel) : "",
+        payment: ""
+      };
+    }
+
+    function tenantSnapshot(tenant) {
+      const property = findProperty(tenant.propertyId) || {};
+      return {
+        ...property,
+        nome: tenant.nome,
+        telefone: tenant.telefone,
+        email: tenant.email,
+        valorAluguel: tenant.valorAluguel,
+        plano: tenant.plano,
+        vigenciaContrato: tenant.vigenciaContrato,
+        dataReajuste: tenant.dataReajuste,
+        renovacaoSeguro: tenant.renovacaoSeguro || property.vigenciaSeguro
+      };
+    }
+
+    function getCurrentStatementPdf() {
+      const statement = saveStatementFromDom(currentStatementTenantId, false);
+      const tenant = findTenant(statement?.tenantId);
+      if (!statement || !tenant) return null;
+      updateRowTotals();
+      const snapshot = tenantSnapshot(tenant);
+      return {
+        statement,
+        tenant,
+        snapshot,
+        blob: createStatementPdf(statement, snapshot),
+        filename: pdfFileName(statement, tenant)
+      };
+    }
+
+    function downloadStatementPdf() {
+      const pdf = getCurrentStatementPdf();
+      if (!pdf) return;
+      downloadBlob(pdf.blob, pdf.filename);
+      showToast("PDF gerado.");
+    }
+
+    function printStatementPdf() {
+      const pdf = getCurrentStatementPdf();
+      if (!pdf) return;
+      const url = URL.createObjectURL(pdf.blob);
+      const printWindow = window.open(url, "_blank");
+      if (!printWindow) {
+        downloadBlob(pdf.blob, pdf.filename);
+        URL.revokeObjectURL(url);
+        showToast("PDF gerado. Abra o arquivo baixado para imprimir sem cabeçalho do navegador.");
+        return;
+      }
+      showToast("PDF aberto para impressão sem URL, data ou título do navegador.");
+      setTimeout(() => {
+        try {
+          printWindow.focus();
+          printWindow.print();
+        } catch (error) {
+          showToast("PDF aberto. Use Ctrl+P nessa aba para imprimir.");
+        }
+      }, 900);
+      setTimeout(() => URL.revokeObjectURL(url), 60000);
+    }
+
+    async function sendWhatsapp() {
+      const pdf = getCurrentStatementPdf();
+      if (!pdf) return;
+      const file = new File([pdf.blob], pdf.filename, { type: "application/pdf" });
+      const message = whatsappMessage(pdf.statement, pdf.snapshot);
+
+      if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
+        try {
+          await navigator.share({ title: "Demonstrativo de cobrança", text: message, files: [file] });
+          showToast("PDF formatado enviado para compartilhamento.");
+          return;
+        } catch (error) {
+          if (error.name === "AbortError") return;
+        }
+      }
+
+      downloadBlob(pdf.blob, pdf.filename);
+      const phone = firstPhoneDigits(pdf.snapshot.telefone);
+      const baseUrl = phone ? `https://wa.me/${phone}` : "https://wa.me/";
+      const url = `${baseUrl}?text=${encodeURIComponent(message + "\n\nO PDF formatado foi baixado. Anexe o arquivo nesta conversa para manter a formatação.")}`;
+      window.open(url, "_blank", "noopener");
+      showToast("PDF formatado baixado; anexe no WhatsApp aberto.");
+    }
+
+    function createStatementPdf(statement, snapshot) {
+      return buildReferenceStyleStatementPdf(statement, snapshot);
+    }
+
+    function buildReferenceStyleStatementPdf(statement, snapshot) {
+      const pageWidth = 595.28;
+      const pageHeight = 841.89;
+      const margin = 61;
+      const tableWidth = 472;
+      const rows = statement.rows || [];
+      const total = rows.reduce((sum, row) => sum + rowBalance(row), 0);
+      const ops = [];
+      const logoHex = base64ToAsciiHex((typeof window !== "undefined" && window.APP_LOGO_JPEG_BASE64) || "");
+      const hasLogoImage = Boolean(logoHex);
+
+      const navy = [0.07, 0.18, 0.27];
+      const blue = [0.12, 0.22, 0.55];
+      const lightBlue = [0.80, 0.88, 0.94];
+      const lightGray = [0.94, 0.94, 0.94];
+      const gray = [0.55, 0.55, 0.55];
+      const red = [0.92, 0.00, 0.00];
+      const black = [0, 0, 0];
+      const yellow = [1.00, 1.00, 0.00];
+      const paleRed = [0.94, 0.72, 0.70];
+
+      function rgb(values, mode = "rg") {
+        return `${values.map((value) => value.toFixed(3)).join(" ")} ${mode}`;
+      }
+
+      function rect(x, top, w, h, fill = null, stroke = null) {
+        if (fill) ops.push(`${rgb(fill)} ${x.toFixed(2)} ${(top - h).toFixed(2)} ${w.toFixed(2)} ${h.toFixed(2)} re f`);
+        if (stroke) ops.push(`${rgb(stroke, "RG")} ${x.toFixed(2)} ${(top - h).toFixed(2)} ${w.toFixed(2)} ${h.toFixed(2)} re S`);
+      }
+
+      function line(x1, y1, x2, y2, color = gray, width = 0.6) {
+        ops.push(`${rgb(color, "RG")} ${width} w ${x1.toFixed(2)} ${y1.toFixed(2)} m ${x2.toFixed(2)} ${y2.toFixed(2)} l S`);
+      }
+
+      function textWidth(text, size) {
+        return normalizePdfText(text).length * size * 0.48;
+      }
+
+      function fitText(text, width, size) {
+        let fitted = normalizePdfText(text || "-");
+        if (textWidth(fitted, size) <= width) return fitted;
+        while (fitted.length > 4 && textWidth(`${fitted}...`, size) > width) {
+          fitted = fitted.slice(0, -1);
+        }
+        return `${fitted}...`;
+      }
+
+      function drawText(text, x, y, size = 8, font = "F1", color = black) {
+        ops.push(`BT /${font} ${size} Tf ${rgb(color)} ${x.toFixed(2)} ${y.toFixed(2)} Td (${escapePdf(normalizePdfText(text))}) Tj ET`);
+      }
+
+      function drawRightText(text, right, y, size = 8, font = "F1", color = black) {
+        drawText(text, right - textWidth(text, size), y, size, font, color);
+      }
+
+      function drawCenterText(text, center, y, size = 8, font = "F1", color = black) {
+        drawText(text, center - textWidth(text, size) / 2, y, size, font, color);
+      }
+
+      function wrapForWidth(text, width, size = 7) {
+        const maxChars = Math.max(8, Math.floor(width / (size * 0.48)));
+        return wrapText(normalizePdfText(text || ""), maxChars);
+      }
+
+      function base64ToAsciiHex(base64) {
+        const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+        let buffer = 0;
+        let bits = 0;
+        let hex = "";
+        String(base64 || "").replace(/\s/g, "").split("").forEach((char) => {
+          if (char === "=") return;
+          const value = alphabet.indexOf(char);
+          if (value < 0) return;
+          buffer = (buffer << 6) | value;
+          bits += 6;
+          if (bits >= 8) {
+            bits -= 8;
+            const byte = (buffer >> bits) & 255;
+            hex += byte.toString(16).padStart(2, "0").toUpperCase();
+          }
+        });
+        return hex ? `${hex}>` : "";
+      }
+
+      function drawImage(name, x, top, w, h) {
+        ops.push(`q ${w.toFixed(2)} 0 0 ${h.toFixed(2)} ${x.toFixed(2)} ${(top - h).toFixed(2)} cm /${name} Do Q`);
+      }
+
+      function clipCircle(cx, cy, radius) {
+        const k = radius * 0.5522847498;
+        const values = [cx, cy, radius, k].map((value) => Number(value).toFixed(2));
+        const [x, y, r, curve] = values;
+        ops.push(`q ${(Number(x) + Number(r)).toFixed(2)} ${y} m ${(Number(x) + Number(r)).toFixed(2)} ${(Number(y) + Number(curve)).toFixed(2)} ${(Number(x) + Number(curve)).toFixed(2)} ${(Number(y) + Number(r)).toFixed(2)} ${x} ${(Number(y) + Number(r)).toFixed(2)} c ${(Number(x) - Number(curve)).toFixed(2)} ${(Number(y) + Number(r)).toFixed(2)} ${(Number(x) - Number(r)).toFixed(2)} ${(Number(y) + Number(curve)).toFixed(2)} ${(Number(x) - Number(r)).toFixed(2)} ${y} c ${(Number(x) - Number(r)).toFixed(2)} ${(Number(y) - Number(curve)).toFixed(2)} ${(Number(x) - Number(curve)).toFixed(2)} ${(Number(y) - Number(r)).toFixed(2)} ${x} ${(Number(y) - Number(r)).toFixed(2)} c ${(Number(x) + Number(curve)).toFixed(2)} ${(Number(y) - Number(r)).toFixed(2)} ${(Number(x) + Number(r)).toFixed(2)} ${(Number(y) - Number(curve)).toFixed(2)} ${(Number(x) + Number(r)).toFixed(2)} ${y} c h W n`);
+      }
+
+      function drawField(label, value, labelX, valueX, y, valueSize = 7.1, maxWidth = 128) {
+        drawRightText(label, labelX, y, 6.8, "F2", gray);
+        drawText(fitText(value || "-", maxWidth, valueSize), valueX, y, valueSize, "F1", black);
+      }
+
+      function drawMoney(value) {
+        return money(value).replace(/\s/g, " ");
+      }
+
+      function drawLogo() {
+        if (hasLogoImage) {
+          clipCircle(122, 711, 34);
+          drawImage("Logo", 88, 745, 68, 68);
+          ops.push("Q");
+          return;
+        }
+        rect(99, 729, 40, 24, [0.78, 0.92, 0.94], null);
+        drawCenterText("PL", 119, 713, 15, "F2", navy);
+        drawCenterText("O PONTO", 119, 696, 6.8, "F2", navy);
+        drawCenterText("DA LOCAÇÃO", 119, 688, 6.8, "F2", navy);
+      }
+
+      function drawBankBox() {
+        const x = 308;
+        const y = 735;
+        const w = 214;
+        const h = 58;
+        rect(x, y, w, h, lightBlue, null);
+        drawCenterText(`Banco: ${state.settings.bank || ""}`, x + w / 2, y - 11, 8.4, "F2", black);
+        drawCenterText(`Agência: ${state.settings.agency || ""}`, x + w / 2, y - 24, 8.4, "F2", black);
+        drawCenterText(`Conta Corrente: ${state.settings.account || ""}`, x + w / 2, y - 37, 8.4, "F2", black);
+        drawCenterText(`Pix: ${state.settings.pix || ""}`, x + w / 2, y - 50, 8.4, "F2", black);
+      }
+
+      function drawTop() {
+        line(49, 786, 546, 786, lightBlue, 3.5);
+        drawLogo();
+        drawBankBox();
+        drawCenterText(`DEMONSTRATIVO DE COBRANÇA - ${statement.referenceYear || CURRENT_YEAR}`, pageWidth / 2, 651, 10.8, "F2", gray);
+      }
+
+      function drawTenantBlocks() {
+        const leftLabel = 121;
+        const leftValue = 137;
+        const midLabel = 249;
+        const midValue = 265;
+        const rightLabel = 404;
+        const rightValue = 416;
+        const y0 = 632;
+        const step = 10;
+
+        drawField("Mês de Referência:", statement.month, leftLabel, leftValue, y0, 7.5, 86);
+        drawField("Vencimento:", formatDate(statement.dueDate), leftLabel, leftValue, y0 - step, 7.5, 86);
+        drawField("Id. / Locatário:", statement.tenantId, leftLabel, leftValue, y0 - step * 2, 7.2, 86);
+        drawField("Cel.:", snapshot.telefone, leftLabel, leftValue, y0 - step * 3, 7.1, 86);
+        drawField("Valor do Aluguel:", drawMoney(toNumber(snapshot.valorAluguel)), leftLabel, leftValue, y0 - step * 4, 7.1, 86);
+        drawField("Vigência:", formatDate(snapshot.vigenciaContrato), leftLabel, leftValue, y0 - step * 5, 7.0, 86);
+        drawField("Renov. Seguro:", formatDate(snapshot.renovacaoSeguro), leftLabel, leftValue, y0 - step * 6, 7.1);
+        drawField("Valor do Seguro:", drawMoney(toNumber(snapshot.valorSeguro)), leftLabel, leftValue, y0 - step * 7, 7.1);
+
+        drawField("Nome:", snapshot.nome, midLabel, midValue, y0 - step * 2, 6.7, 76);
+        drawField("E-mail:", snapshot.email, midLabel, midValue, y0 - step * 3, 6.7, 76);
+        drawField("Plano:", snapshot.plano, midLabel, midValue, y0 - step * 4, 7.0, 76);
+        drawField("Reaj.:", snapshot.dataReajuste, midLabel, midValue, y0 - step * 5, 7.0, 76);
+        drawField("Apólice:", snapshot.apoliceSeguro, midLabel, midValue, y0 - step * 6, 7.0, 76);
+        drawField("Status:", "", midLabel, midValue, y0 - step * 7, 7.0);
+        rect(midValue, y0 - step * 7 + 8, 59, 10, yellow, null);
+        drawText(fitText(snapshot.situacaoSeguro || "-", 56, 6.6), midValue + 2, y0 - step * 7, 6.6, "F1", black);
+
+        drawField("Empreendimento:", snapshot.empreendimento, rightLabel, rightValue, y0 - step, 6.4, 105);
+        drawField("End.:", snapshot.endereco, rightLabel, rightValue, y0 - step * 2, 6.2, 105);
+        drawField("Bairro:", snapshot.bairro, rightLabel, rightValue, y0 - step * 3, 6.8, 105);
+        drawField("Cidade/UF:", `${snapshot.cidade || ""}/${snapshot.uf || ""}`, rightLabel, rightValue, y0 - step * 4, 6.8, 105);
+        drawField(`IPTU-${CURRENT_YEAR}:`, formatLooseMoney(snapshot.iptuValor), rightLabel, rightValue, y0 - step * 5, 6.8, 44);
+        drawField("Status:", snapshot.iptuStatus || "-", 472, 479, y0 - step * 5, 6.7, 43);
+        drawField("Taxa de Incêndio:", drawMoney(toNumber(snapshot.taxaCbmerj)), rightLabel, rightValue, y0 - step * 6, 6.8, 44);
+        drawField("Status:", "", 472, 479, y0 - step * 6, 6.7);
+        rect(479, y0 - step * 6 + 8, 48, 10, paleRed, null);
+        drawText(fitText(snapshot.cbmerjStatus || "-", 45, 6.7), 481, y0 - step * 6, 6.7, "F1", black);
+        drawField("Central Seguro 24h:", state.settings.centralSeguro24h || snapshot.telefoneSeguradora, rightLabel, rightValue, y0 - step * 7, 6.2, 105);
+      }
+
+      function drawDetailTitle() {
+        line(61, 545, 61, 529, gray, .45);
+        line(522, 545, 522, 529, gray, .45);
+        drawCenterText("DETALHAMENTO DO MÊS", pageWidth / 2, 532, 11.2, "F2", black);
+        line(61, 505, 522, 505, gray, .5);
+      }
+
+      function drawTable() {
+        const startX = 61;
+        let y = 493;
+        const rowH = 10.5;
+        const columns = [
+          ["DATA", 68],
+          ["CATEGORIA", 72],
+          ["DESCRIÇÃO", 122],
+          ["OBSERVAÇÃO", 72],
+          ["VALOR", 54],
+          ["PGTO", 42],
+          ["SALDO", 42]
+        ];
+        let x = startX;
+        columns.forEach(([label, width]) => {
+          drawCenterText(label, x + width / 2, y, 7.8, "F2", blue);
+          x += width;
+        });
+        y -= 11;
+
+        const visibleRows = rows.slice(0, 12);
+        while (visibleRows.length < 12) visibleRows.push({ date: "", category: "", description: "", observation: "", value: "", payment: "" });
+
+        visibleRows.forEach((row, index) => {
+          if (index % 2 === 0) rect(startX, y + 8, tableWidth, rowH, lightGray, null);
+          x = startX;
+          const values = [
+            row.date ? formatDate(row.date) : "",
+            row.category || "",
+            row.description || "",
+            row.observation || "",
+            row.value === "" ? "" : drawMoney(toNumber(row.value)),
+            row.payment === "" ? "" : drawMoney(toNumber(row.payment)),
+            drawMoney(rowBalance(row))
+          ];
+          values.forEach((value, colIndex) => {
+            const width = columns[colIndex][1];
+            const size = colIndex === 2 ? 6.1 : 6.8;
+            if (colIndex >= 4) drawRightText(value, x + width - 2, y, 6.7, colIndex === 6 ? "F1" : "F1", gray);
+            else drawCenterText(value, x + width / 2, y, size, colIndex === 1 ? "F2" : "F1", gray);
+            x += width;
+          });
+          y -= rowH;
+        });
+
+        line(startX, y + 3, startX + tableWidth, y + 3, gray, .5);
+        drawText("TOTAL A DEPOSITAR:", 304, y - 11, 11, "F2", red);
+        drawRightText(drawMoney(total), 533, y - 11, 11, "F2", red);
+        return y - 35;
+      }
+
+      function drawAdjustedDetailTable() {
+        const startX = 61;
+        let y = 493;
+        const rowH = 10.5;
+        const columns = [
+          ["DATA", 52],
+          ["CATEGORIA", 72],
+          ["DESCRIÇÃO", 105],
+          ["OBSERVAÇÃO", 101],
+          ["VALOR", 50],
+          ["PAGAMENTO", 52],
+          ["SALDO", 40]
+        ];
+
+        function fitCell(value, width, size) {
+          return value ? fitText(value, width, size) : "";
+        }
+
+        let x = startX;
+        columns.forEach(([label, width]) => {
+          const headerSize = label === "PAGAMENTO" ? 6.6 : 7.6;
+          drawCenterText(label, x + width / 2, y, headerSize, "F2", blue);
+          x += width;
+        });
+        y -= 11;
+
+        const visibleRows = rows.slice(0, 12);
+        while (visibleRows.length < 12) visibleRows.push({ date: "", category: "", description: "", observation: "", value: "", payment: "" });
+
+        visibleRows.forEach((row, index) => {
+          if (index % 2 === 0) rect(startX, y + 8, tableWidth, rowH, lightGray, null);
+          x = startX;
+          const values = [
+            row.date ? formatDate(row.date) : "",
+            row.category || "",
+            row.description || "",
+            row.observation || "",
+            row.value === "" ? "" : drawMoney(toNumber(row.value)),
+            row.payment === "" ? "" : drawMoney(toNumber(row.payment)),
+            drawMoney(rowBalance(row))
+          ];
+
+          values.forEach((value, colIndex) => {
+            const width = columns[colIndex][1];
+            const size = colIndex === 2 || colIndex === 3 ? 5.9 : colIndex >= 4 ? 6.25 : 6.5;
+            const cellText = fitCell(value, width - (colIndex >= 4 ? 4 : 6), size);
+            if (colIndex >= 4) drawRightText(cellText, x + width - 2, y, size, "F1", gray);
+            else drawCenterText(cellText, x + width / 2, y, size, colIndex === 1 ? "F2" : "F1", gray);
+            x += width;
+          });
+          y -= rowH;
+        });
+
+        line(startX, y + 3, startX + tableWidth, y + 3, gray, .5);
+        drawText("TOTAL A DEPOSITAR:", 304, y - 11, 11, "F2", red);
+        drawRightText(drawMoney(total), 533, y - 11, 11, "F2", red);
+        return y - 35;
+      }
+
+      function drawPhones(y) {
+        line(61, y + 12, 61, y - 36, gray, .5);
+        line(522, y + 12, 522, y - 36, gray, .5);
+        drawCenterText("TELEFONES IMPORTANTES:", 292, y, 9.7, "F2", black);
+
+        function drawPhoneLine(label, value, labelRight, valueX, baseline) {
+          drawRightText(label, labelRight, baseline, 7.0, "F2", black);
+          drawText(value, valueX, baseline, 7.0, "F2", black);
+        }
+
+        drawPhoneLine("CEG:", "0800 024 7766", 194, 207, y - 12);
+        drawPhoneLine("LIGHT:", "0800 282 0120", 194, 207, y - 23);
+        drawPhoneLine("CEDAE:", "0800 282 1195", 194, 207, y - 34);
+        drawPhoneLine("Polícia Militar:", "190", 397, 412, y - 12);
+        drawPhoneLine("Bombeiros:", "193", 397, 412, y - 23);
+        drawPhoneLine("Defesa Civil:", "199", 397, 412, y - 34);
+      }
+
+      function drawBottom() {
+        drawText("OBSERVAÇÕES:", 61, 277, 8, "F2", black);
+        rect(61, 273, 461, 62, null, [0.83, 0.83, 0.83]);
+        if (statement.notes) {
+          wrapForWidth(statement.notes, 447, 7).slice(0, 5).forEach((noteLine, index) => {
+            drawText(noteLine, 68, 258 - index * 10, 7, "F1", black);
+          });
+        }
+        line(250, 202, 334, 202, gray, .75);
+        drawCenterText("ATENÇÃO!", pageWidth / 2, 184, 8, "F2", black);
+        wrapForWidth("O não pagamento até o prazo estipulado caracteriza infração contratual grave, nos termos da Cláusula 26.1 e do art. 9, inciso III, da Lei n. 8.245/91 (Lei do Inquilinato).", 430, 7.3).slice(0, 3).forEach((warningLine, index) => {
+          drawCenterText(warningLine, pageWidth / 2, 174 - index * 9, 7.3, "F1", black);
+        });
+        line(250, 146, 334, 146, gray, .75);
+        wrapForWidth("Após realizar a transação de depósito/transferência, solicitamos que envie o comprovante no grupo de WhatsApp de sua locação.", 350, 7.2).slice(0, 2).forEach((lineText, index) => {
+          drawCenterText(lineText, pageWidth / 2, 117 - index * 10, 7.2, "F3", red);
+        });
+        drawCenterText(state.settings.company || "O Ponto da Locação", pageWidth / 2, 72, 8, "F2", [0.42, 0.65, 0.86]);
+        drawCenterText(state.settings.slogan || "", pageWidth / 2, 61, 8, "F1", [0.42, 0.65, 0.86]);
+      }
+
+      rect(0, pageHeight, pageWidth, pageHeight, [1, 1, 1], null);
+      drawTop();
+      drawTenantBlocks();
+      drawDetailTitle();
+      const phoneY = drawAdjustedDetailTable();
+      drawPhones(phoneY);
+      drawBottom();
+
+      const objects = [];
+      objects.push("<< /Type /Catalog /Pages 2 0 R >>");
+      objects.push("<< /Type /Pages /Kids [5 0 R] /Count 1 >>");
+      objects.push("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>");
+      objects.push("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>");
+      const imageResource = hasLogoImage ? " /XObject << /Logo 8 0 R >>" : "";
+      objects.push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageWidth} ${pageHeight}] /Resources << /Font << /F1 3 0 R /F2 4 0 R /F3 7 0 R >>${imageResource} >> /Contents 6 0 R >>`);
+      const stream = ops.join("\n");
+      objects.push(`<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`);
+      objects.push("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Oblique /Encoding /WinAnsiEncoding >>");
+      if (hasLogoImage) {
+        objects.push(`<< /Type /XObject /Subtype /Image /Width 1280 /Height 1280 /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter [/ASCIIHexDecode /DCTDecode] /Length ${logoHex.length} >>\nstream\n${logoHex}\nendstream`);
+      }
+
+      let pdf = "%PDF-1.4\n";
+      const offsets = [0];
+      objects.forEach((object, index) => {
+        offsets.push(pdf.length);
+        pdf += `${index + 1} 0 obj\n${object}\nendobj\n`;
+      });
+      const xref = pdf.length;
+      pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+      offsets.slice(1).forEach((offset) => {
+        pdf += `${String(offset).padStart(10, "0")} 00000 n \n`;
+      });
+      pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;
+      return new Blob([pdf], { type: "application/pdf" });
+    }
+
+    function buildStatementPdf(statement, snapshot) {
+      const pageWidth = 595.28;
+      const pageHeight = 841.89;
+      const margin = 36;
+      const contentWidth = pageWidth - margin * 2;
+      const rows = statement.rows || [];
+      const total = rows.reduce((sum, row) => sum + rowBalance(row), 0);
+      const pages = [];
+      let ops = [];
+      let y = pageHeight - margin;
+
+      const ink = [0.07, 0.18, 0.27];
+      const muted = [0.36, 0.36, 0.30];
+      const line = [0.78, 0.72, 0.58];
+      const soft = [1.00, 0.97, 0.90];
+      const headerFill = [0.07, 0.18, 0.27];
+      const accentFill = [0.91, 0.35, 0.11];
+
+      function startPage(continuation = false) {
+        ops = [];
+        y = pageHeight - margin;
+        if (continuation) {
+          drawText(state.settings.company, margin, y, 10, "F2", ink);
+          drawRightText(`Continuação - ${statement.month}/${statement.referenceYear || CURRENT_YEAR}`, pageWidth - margin, y, 9, "F1", muted);
+          y -= 18;
+        }
+      }
+
+      function finishPage() {
+        pages.push(ops.join("\n"));
+      }
+
+      function ensureSpace(needed, redrawTable = false) {
+        if (y - needed >= margin) return;
+        finishPage();
+        startPage(true);
+        if (redrawTable) drawTableHeader();
+      }
+
+      function rgb(values, mode = "rg") {
+        return `${values.map((value) => value.toFixed(3)).join(" ")} ${mode}`;
+      }
+
+      function rect(x, top, w, h, fill = null, stroke = line) {
+        if (fill) ops.push(`${rgb(fill)} ${x} ${top - h} ${w} ${h} re f`);
+        if (stroke) ops.push(`${rgb(stroke, "RG")} ${x} ${top - h} ${w} ${h} re S`);
+      }
+
+      function textWidth(text, size) {
+        return normalizePdfText(text).length * size * 0.48;
+      }
+
+      function drawText(text, x, baseline, size = 9, font = "F1", color = ink) {
+        ops.push(`BT /${font} ${size} Tf ${rgb(color)} ${x.toFixed(2)} ${baseline.toFixed(2)} Td (${escapePdf(normalizePdfText(text))}) Tj ET`);
+      }
+
+      function drawRightText(text, right, baseline, size = 9, font = "F1", color = ink) {
+        drawText(text, right - textWidth(text, size), baseline, size, font, color);
+      }
+
+      function drawCenterText(text, center, baseline, size = 9, font = "F1", color = ink) {
+        drawText(text, center - textWidth(text, size) / 2, baseline, size, font, color);
+      }
+
+      function wrapForWidth(text, width, size = 8.5) {
+        const maxChars = Math.max(8, Math.floor(width / (size * 0.48)));
+        return wrapText(normalizePdfText(text || "-"), maxChars);
+      }
+
+      function drawWrapped(text, x, top, width, size = 8.5, leading = 10, font = "F1", color = ink, maxLines = 2) {
+        const lines = wrapForWidth(text, width, size).slice(0, maxLines);
+        lines.forEach((line, index) => drawText(line, x, top - index * leading, size, font, color));
+      }
+
+      function moneyPdf(value) {
+        return money(value).replace(/\s/g, " ");
+      }
+
+      function drawInfoBox(label, value, x, top, w, h) {
+        rect(x, top, w, h, soft, line);
+        drawText(label.toUpperCase(), x + 5, top - 10, 6.6, "F2", muted);
+        drawWrapped(value || "-", x + 5, top - 22, w - 10, 8.4, 9.5, "F1", ink, 2);
+      }
+
+      function drawMainHeader() {
+        drawText(state.settings.company || "O Ponto da Locação", margin, y, 15, "F2", ink);
+        drawText(state.settings.slogan || "", margin, y - 14, 9, "F1", muted);
+        rect(margin, y - 24, 126, 4, accentFill, accentFill);
+        const boxW = 214;
+        rect(pageWidth - margin - boxW, y + 8, boxW, 58, soft, line);
+        drawText("DADOS DE DEPÓSITO", pageWidth - margin - boxW + 8, y - 3, 7.4, "F2", muted);
+        drawText(`Banco: ${state.settings.bank || ""}`, pageWidth - margin - boxW + 8, y - 16, 8.4, "F1", ink);
+        drawText(`Agência: ${state.settings.agency || ""}`, pageWidth - margin - boxW + 8, y - 28, 8.4, "F1", ink);
+        drawText(`Conta: ${state.settings.account || ""}`, pageWidth - margin - boxW + 8, y - 40, 8.4, "F1", ink);
+        drawText(`Pix: ${state.settings.pix || ""}`, pageWidth - margin - boxW + 8, y - 52, 8.4, "F1", ink);
+        y -= 72;
+
+        rect(margin, y + 16, contentWidth, 26, headerFill, headerFill);
+        drawCenterText(`DEMONSTRATIVO DE COBRANÇA - ${statement.referenceYear || CURRENT_YEAR}`, pageWidth / 2, y - 1, 12.5, "F2", [1, 1, 1]);
+        y -= 24;
+
+        const boxGap = 7;
+        const boxW2 = (contentWidth - boxGap * 2) / 3;
+        drawInfoBox("Mês de referência", statement.month, margin, y + 34, boxW2, 34);
+        drawInfoBox("Vencimento", formatDate(statement.dueDate), margin + boxW2 + boxGap, y + 34, boxW2, 34);
+        drawInfoBox("ID / Locatário", statement.tenantId, margin + (boxW2 + boxGap) * 2, y + 34, boxW2, 34);
+        y -= 42;
+      }
+
+      function drawSnapshotGrid() {
+        const info = [
+          ["Nome", snapshot.nome],
+          ["Celular", snapshot.telefone],
+          ["E-mail", snapshot.email],
+          ["Aluguel", moneyPdf(toNumber(snapshot.valorAluguel))],
+          ["Plano", snapshot.plano],
+          ["Vigência contrato", formatDate(snapshot.vigenciaContrato)],
+          ["Reajuste", snapshot.dataReajuste],
+          ["Renovação seguro", formatDate(snapshot.renovacaoSeguro)],
+          ["Valor seguro", moneyPdf(toNumber(snapshot.valorSeguro))],
+          ["Status seguro", snapshot.situacaoSeguro],
+          ["Empreendimento", snapshot.empreendimento],
+          ["Endereço", snapshot.endereco],
+          ["Bairro", snapshot.bairro],
+          ["Cidade / UF", `${snapshot.cidade || ""}/${snapshot.uf || ""}`],
+          [`IPTU ${CURRENT_YEAR}`, `${formatLooseMoney(snapshot.iptuValor)} ${snapshot.iptuStatus || ""}`],
+          ["Taxa incêndio", `${moneyPdf(toNumber(snapshot.taxaCbmerj))} ${snapshot.cbmerjStatus || ""}`],
+          ["Apólice", snapshot.apoliceSeguro],
+          ["Central Seguro 24h", state.settings.centralSeguro24h || snapshot.telefoneSeguradora]
+        ];
+        const cols = 3;
+        const gap = 6;
+        const w = (contentWidth - gap * (cols - 1)) / cols;
+        const h = 36;
+        for (let i = 0; i < info.length; i += cols) {
+          ensureSpace(h + 7);
+          for (let col = 0; col < cols; col++) {
+            const item = info[i + col];
+            if (!item) continue;
+            drawInfoBox(item[0], item[1], margin + col * (w + gap), y + h, w, h);
+          }
+          y -= h + 6;
+        }
+      }
+
+      const columns = [
+        ["DATA", 55],
+        ["CATEGORIA", 76],
+        ["DESCRIÇÃO", 113],
+        ["OBSERVAÇÃO", 92],
+        ["VALOR", 62],
+        ["PGTO", 62],
+        ["SALDO", 63]
+      ];
+
+      function drawTableHeader() {
+        rect(margin, y, contentWidth, 22, headerFill, headerFill);
+        let x = margin;
+        columns.forEach(([label, width]) => {
+          drawCenterText(label, x + width / 2, y - 14, 7.2, "F2", [1, 1, 1]);
+          x += width;
+        });
+        y -= 22;
+      }
+
+      function drawDetailRows() {
+        ensureSpace(54);
+        drawCenterText("DETALHAMENTO DO MÊS", pageWidth / 2, y, 10.5, "F2", ink);
+        y -= 14;
+        drawTableHeader();
+        rows.forEach((row) => {
+          const descLines = wrapForWidth(row.description || "-", columns[2][1] - 8, 7.8).slice(0, 2);
+          const obsLines = wrapForWidth(row.observation || "-", columns[3][1] - 8, 7.8).slice(0, 2);
+          const rowHeight = Math.max(25, 14 + Math.max(descLines.length, obsLines.length) * 9);
+          ensureSpace(rowHeight + 38, true);
+          let x = margin;
+          columns.forEach(([, width]) => {
+            rect(x, y, width, rowHeight, null, line);
+            x += width;
+          });
+          x = margin;
+          drawWrapped(formatDate(row.date), x + 4, y - 11, columns[0][1] - 8, 7.8, 9, "F1", ink, 2);
+          x += columns[0][1];
+          drawWrapped(row.category || "-", x + 4, y - 11, columns[1][1] - 8, 7.8, 9, "F1", ink, 2);
+          x += columns[1][1];
+          drawWrapped(row.description || "-", x + 4, y - 11, columns[2][1] - 8, 7.8, 9, "F1", ink, 2);
+          x += columns[2][1];
+          drawWrapped(row.observation || "-", x + 4, y - 11, columns[3][1] - 8, 7.8, 9, "F1", ink, 2);
+          x += columns[3][1];
+          drawRightText(moneyPdf(toNumber(row.value)), x + columns[4][1] - 4, y - 13, 7.8, "F1", ink);
+          x += columns[4][1];
+          drawRightText(moneyPdf(toNumber(row.payment)), x + columns[5][1] - 4, y - 13, 7.8, "F1", ink);
+          x += columns[5][1];
+          drawRightText(moneyPdf(rowBalance(row)), x + columns[6][1] - 4, y - 13, 7.8, "F2", ink);
+          y -= rowHeight;
+        });
+
+        ensureSpace(42);
+        rect(margin + contentWidth - 210, y, 210, 30, [1.00, 0.94, 0.84], line);
+        drawText("TOTAL A DEPOSITAR", margin + contentWidth - 203, y - 19, 8, "F2", muted);
+        drawRightText(moneyPdf(total), margin + contentWidth - 7, y - 19, 12, "F2", ink);
+        y -= 42;
+      }
+
+      function drawNotes() {
+        ensureSpace(70);
+        drawText("OBSERVAÇÕES", margin, y, 9, "F2", ink);
+        y -= 12;
+        const noteText = statement.notes || "Após realizar a transação de depósito/transferência, solicitamos que envie o comprovante no grupo de WhatsApp de sua locação.";
+        wrapForWidth(noteText, contentWidth, 8.2).slice(0, 6).forEach((lineText) => {
+          drawText(lineText, margin, y, 8.2, "F1", ink);
+          y -= 10;
+        });
+      }
+
+      startPage();
+      drawMainHeader();
+      drawSnapshotGrid();
+      drawDetailRows();
+      drawNotes();
+      finishPage();
+
+      const objects = [];
+      objects.push("<< /Type /Catalog /Pages 2 0 R >>");
+      const kids = pages.map((_, index) => `${5 + index * 2} 0 R`).join(" ");
+      objects.push(`<< /Type /Pages /Kids [${kids}] /Count ${pages.length} >>`);
+      objects.push("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>");
+      objects.push("<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>");
+      pages.forEach((stream, index) => {
+        const pageObj = 5 + index * 2;
+        const contentObj = pageObj + 1;
+        objects.push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageWidth} ${pageHeight}] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${contentObj} 0 R >>`);
+        objects.push(`<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`);
+      });
+
+      let pdf = "%PDF-1.4\n";
+      const offsets = [0];
+      objects.forEach((object, index) => {
+        offsets.push(pdf.length);
+        pdf += `${index + 1} 0 obj\n${object}\nendobj\n`;
+      });
+      const xref = pdf.length;
+      pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+      offsets.slice(1).forEach((offset) => {
+        pdf += `${String(offset).padStart(10, "0")} 00000 n \n`;
+      });
+      pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;
+      return new Blob([pdf], { type: "application/pdf" });
+    }
+
+    function bindRowActions() {
+      view.querySelectorAll("[data-action]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const id = button.dataset.id;
+          const action = button.dataset.action;
+          if (action === "edit-property") {
+            editing.propertyId = id;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            renderProperties();
+          }
+          if (action === "delete-property") deleteProperty(id);
+          if (action === "edit-tenant") {
+            editing.tenantId = id;
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            renderTenants();
+          }
+          if (action === "delete-tenant") deleteTenant(id);
+        });
+      });
+    }
+
+    function deleteProperty(id) {
+      const hasTenant = state.tenants.some((tenant) => tenant.propertyId === id);
+      if (hasTenant) return showToast("Não exclua imóvel com vínculo locatário. Encerre ou altere o vínculo primeiro.");
+      if (!confirm("Excluir este imóvel?")) return;
+      state.properties = state.properties.filter((property) => property.id !== id);
+      save();
+      renderProperties();
+      showToast("Imóvel excluído.");
+    }
+
+    function deleteTenant(id) {
+      if (!confirm("Excluir este vínculo locatário?")) return;
+      state.tenants = state.tenants.filter((tenant) => tenant.id !== id);
+      delete state.statements[id];
+      save();
+      renderTenants();
+      showToast("Vínculo excluído.");
+    }
+
+    function propertyPreview(property) {
+      if (!property) return empty("Selecione um imóvel cadastrado.");
+      return `
+        <div class="kv-grid">
+          ${kv("Empreendimento", property.empreendimento)}
+          ${kv("Endereço", compactAddress(property))}
+          ${kv(`IPTU ${CURRENT_YEAR}`, `${formatLooseMoney(property.iptuValor)} ${property.iptuStatus ? "- " + property.iptuStatus : ""}`)}
+          ${kv("CBMERJ", `${money(toNumber(property.taxaCbmerj))} ${property.cbmerjStatus ? "- " + property.cbmerjStatus : ""}`)}
+          ${kv("Apólice", property.apoliceSeguro)}
+          ${kv("Seguradora", property.nomeSeguradora)}
+          ${kv("Vigência seguro", formatDate(property.vigenciaSeguro))}
+          ${kv("Valor seguro", money(toNumber(property.valorSeguro)))}
+        </div>
+      `;
+    }
+
+    function metric(label, value) {
+      return `<div class="metric"><span>${escapeHtml(label)}</span><strong>${escapeHtml(String(value))}</strong></div>`;
+    }
+
+    function kv(label, value) {
+      return `<div class="kv"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value || "-")}</strong></div>`;
+    }
+
+    function phoneItem(label, value) {
+      return `<div class="phone-item"><strong class="phone-name">${escapeHtml(label)}:</strong><span class="phone-number">${escapeHtml(value)}</span></div>`;
+    }
+
+    function empty(message) {
+      return `<div class="empty">${escapeHtml(message)}</div>`;
+    }
+
+    function statusPill(valueText = "") {
+      const text = String(valueText || "").trim() || "-";
+      const normalized = text.toLowerCase();
+      let className = "";
+      if (normalized.includes("ativo") || normalized.includes("quitado")) className = "active";
+      if (normalized.includes("encerrado") || normalized.includes("inativo")) className = "closed";
+      if (normalized.includes("aguardando") || normalized.includes("parcel")) className = "warn";
+      if (normalized.includes("atras")) className = "bad";
+      return `<span class="status ${className}">${escapeHtml(text)}</span>`;
+    }
+
+    function propertyOptions(selected) {
+      return state.properties.map((property) => {
+        const label = `${property.id} - ${property.empreendimento || property.endereco || ""}`;
+        return `<option value="${attr(property.id)}" ${property.id === selected ? "selected" : ""}>${escapeHtml(label)}</option>`;
+      }).join("");
+    }
+
+    function options(values, selected) {
+      return values.map((item) => {
+        const valueText = Array.isArray(item) ? item[0] : item;
+        const label = Array.isArray(item) ? item[1] : item;
+        return `<option value="${attr(valueText)}" ${String(valueText) === String(selected) ? "selected" : ""}>${escapeHtml(label)}</option>`;
+      }).join("");
+    }
+
+    function withCurrent(list, current) {
+      const values = [...list];
+      if (current && !values.includes(current)) values.push(current);
+      return values;
+    }
+
+    function value(form, key) {
+      return String(form.get(key) || "").trim();
+    }
+
+    function findProperty(id) {
+      return state.properties.find((property) => property.id === id);
+    }
+
+    function findTenant(id) {
+      return state.tenants.find((tenant) => tenant.id === id);
+    }
+
+    function activeTenants() {
+      return state.tenants
+        .filter((tenant) => String(tenant.status || "").toUpperCase() === "ATIVO")
+        .sort((a, b) => a.id.localeCompare(b.id));
+    }
+
+    function compactAddress(property = {}) {
+      const cityUf = [property.cidade, property.uf].filter(Boolean).join("/");
+      return [property.endereco, property.bairro, cityUf].filter(Boolean).join(" - ");
+    }
+
+    function rowBalance(row) {
+      return toNumber(row.value) - toNumber(row.payment);
+    }
+
+    function toNumber(value) {
+      if (typeof value === "number") return Number.isFinite(value) ? value : 0;
+      const text = String(value ?? "").trim();
+      if (!text) return 0;
+      const normalized = text.includes(",") ? text.replace(/\./g, "").replace(",", ".") : text;
+      const number = Number(normalized.replace(/[^\d.-]/g, ""));
+      return Number.isFinite(number) ? number : 0;
+    }
+
+    function money(value) {
+      return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(toNumber(value));
+    }
+
+    function formatLooseMoney(value) {
+      const text = String(value ?? "").trim();
+      if (!text) return "-";
+      if (/[a-zA-Z]/.test(text)) return text;
+      return money(toNumber(text));
+    }
+
+    function formatDate(value) {
+      const text = String(value || "").trim();
+      if (!text) return "-";
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(text)) return text;
+      const [year, month, day] = text.split("-");
+      return `${day}/${month}/${year}`;
+    }
+
+    function formatDateTime(value) {
+      if (!value) return "";
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) return value;
+      return new Intl.DateTimeFormat("pt-BR", {
+        dateStyle: "short",
+        timeStyle: "short"
+      }).format(date);
+    }
+
+    function todayIso() {
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    function numAttr(value) {
+      if (value === "" || value === null || value === undefined) return "";
+      return attr(toNumber(value));
+    }
+
+    function attr(value) {
+      return escapeHtml(String(value ?? ""));
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function addUnique(list, valueText) {
+      const text = String(valueText || "").trim();
+      if (!text) return;
+      if (!list.some((item) => item.toLowerCase() === text.toLowerCase())) list.push(text);
+    }
+
+    function normalizePdfText(text) {
+      return String(text ?? "")
+        .normalize("NFC")
+        .replace(/[“”]/g, '"')
+        .replace(/[‘’]/g, "'")
+        .replace(/[–—]/g, "-")
+        .replace(/\u00A0/g, " ")
+        .replace(/[^\x09\x0A\x0D\x20-\x7E\u00A0-\u00FF]/g, "-");
+    }
+
+    function asciiSlugText(text) {
+      return String(text ?? "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^\x20-\x7E]/g, "-");
+    }
+
+    function wrapText(text, maxChars) {
+      if (!text) return [""];
+      const words = text.split(/\s+/);
+      const lines = [];
+      let line = "";
+      words.forEach((word) => {
+        const next = line ? `${line} ${word}` : word;
+        if (next.length > maxChars) {
+          if (line) lines.push(line);
+          line = word;
+        } else {
+          line = next;
+        }
+      });
+      if (line) lines.push(line);
+      return lines;
+    }
+
+    function escapePdf(text) {
+      return String(text).replace(/[\r\n\t\\()^\x00-\x1F\x7F-\uFFFF]/g, (char) => {
+        if (char === "\\") return "\\\\";
+        if (char === "(") return "\\(";
+        if (char === ")") return "\\)";
+        if (char === "\n") return "\\n";
+        if (char === "\r") return "\\r";
+        if (char === "\t") return "\\t";
+        const code = char.charCodeAt(0);
+        if (code >= 160 && code <= 255) return `\\${code.toString(8).padStart(3, "0")}`;
+        return "-";
+      });
+    }
+
+    function pdfFileName(statement, tenant) {
+      const tenantName = asciiSlugText(tenant.nome || tenant.id).replace(/[^a-zA-Z0-9]+/g, "-").replace(/^-|-$/g, "");
+      return `demonstrativo-${statement.tenantId}-${statement.month}-${statement.referenceYear}-${tenantName}.pdf`.toLowerCase();
+    }
+
+    function whatsappMessage(statement, snapshot) {
+      const total = (statement.rows || []).reduce((sum, row) => sum + rowBalance(row), 0);
+      return [
+        `Olá, ${snapshot.nome}.`,
+        `Segue o demonstrativo de cobrança referente a ${statement.month}/${statement.referenceYear}.`,
+        `Vencimento: ${formatDate(statement.dueDate)}.`,
+        `Total a depositar: ${money(total)}.`,
+        `Dados de depósito: ${state.settings.bank}, agência ${state.settings.agency}, conta ${state.settings.account}, Pix ${state.settings.pix}.`
+      ].join("\n");
+    }
+
+    function firstPhoneDigits(phone) {
+      const match = String(phone || "").match(/\d[\d\s().-]{8,}\d/);
+      let digits = match ? match[0].replace(/\D/g, "") : "";
+      if (digits.length === 10 || digits.length === 11) digits = "55" + digits;
+      return digits;
+    }
+
+    function downloadBlob(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    }
+
+    function exportData() {
+      saveStatementFromDom(currentStatementTenantId, false);
+      const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+      downloadBlob(blob, `backup-gestao-imoveis-${todayIso()}.json`);
+      showToast("Backup exportado.");
+    }
+
+    async function importData(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      try {
+        const parsed = JSON.parse(await file.text());
+        if (!confirm("Importar este backup e substituir os dados atuais?")) return;
+        state = normalizeState(parsed);
+        save();
+        render();
+        showToast("Backup importado.");
+      } catch (error) {
+        showToast("Não foi possível importar o arquivo.");
+      } finally {
+        event.target.value = "";
+      }
+    }
+
+    function bindOnlineEvents() {
+      document.getElementById("cloudForm")?.addEventListener("submit", submitCloudConfig);
+      document.getElementById("cloudLogin")?.addEventListener("click", cloudLoginFromForm);
+      document.getElementById("cloudLogout")?.addEventListener("click", cloudLogout);
+      document.getElementById("cloudPush")?.addEventListener("click", () => pushCloudState({ notify: true }));
+      document.getElementById("cloudPull")?.addEventListener("click", pullCloudState);
+      document.getElementById("cloudTest")?.addEventListener("click", testCloudConnection);
+    }
+
+    function submitCloudConfig(event) {
+      event.preventDefault();
+      const form = new FormData(event.currentTarget);
+      cloudConfig = {
+        ...cloudConfig,
+        url: cleanCloudUrl(value(form, "url")),
+        anonKey: value(form, "anonKey"),
+        email: value(form, "email")
+      };
+      saveCloudConfig();
+      renderOnline();
+      showToast("Conexão online salva.");
+    }
+
+    async function cloudLoginFromForm() {
+      const formEl = document.getElementById("cloudForm");
+      const form = new FormData(formEl);
+      cloudConfig = {
+        ...cloudConfig,
+        url: cleanCloudUrl(value(form, "url")),
+        anonKey: value(form, "anonKey"),
+        email: value(form, "email")
+      };
+      const password = value(form, "password");
+      if (!cloudConfig.url || !cloudConfig.anonKey || !cloudConfig.email || !password) {
+        return showToast("Informe URL, chave anon, e-mail e senha.");
+      }
+      try {
+        const result = await cloudFetch("/auth/v1/token?grant_type=password", {
+          method: "POST",
+          auth: false,
+          body: { email: cloudConfig.email, password }
+        });
+        cloudConfig.accessToken = result.access_token;
+        cloudConfig.refreshToken = result.refresh_token;
+        cloudConfig.expiresAt = Date.now() + Math.max(30, Number(result.expires_in || 3600) - 60) * 1000;
+        cloudConfig.userId = result.user?.id || "";
+        saveCloudConfig();
+        const loaded = await pullCloudState({ silent: true });
+        activeTab = loaded ? "properties" : "online";
+        render();
+        showToast(loaded ? "Login realizado. Dados carregados da nuvem." : "Login realizado. Nenhum dado salvo na nuvem ainda.");
+      } catch (error) {
+        showToast(`Não foi possível entrar: ${error.message}`);
+      }
+    }
+
+    async function cloudLogout() {
+      try {
+        if (isCloudLoggedIn()) await cloudFetch("/auth/v1/logout", { method: "POST" });
+      } catch {}
+      cloudConfig = {
+        url: cloudConfig.url,
+        anonKey: cloudConfig.anonKey,
+        email: cloudConfig.email
+      };
+      saveCloudConfig();
+      renderOnline();
+      showToast("Sessão online encerrada.");
+    }
+
+    async function testCloudConnection() {
+      try {
+        await ensureCloudSession();
+        await cloudFetch("/rest/v1/locacao_app_state?select=updated_at&limit=1");
+        showToast("Conexão com a nuvem funcionando.");
+      } catch (error) {
+        showToast(`Falha na conexão: ${error.message}`);
+      }
+    }
+
+    async function pullCloudState(options = {}) {
+      try {
+        await ensureCloudSession();
+        const rows = await cloudFetch(`/rest/v1/locacao_app_state?user_id=eq.${encodeURIComponent(cloudConfig.userId)}&select=payload,updated_at&limit=1`);
+        const payload = rows?.[0]?.payload;
+        if (!payload) {
+          if (!options.silent) showToast("Nenhum dado encontrado na nuvem.");
+          return false;
+        }
+        suppressCloudSync = true;
+        state = normalizeState(payload);
+        save();
+        suppressCloudSync = false;
+        if (!options.silent) {
+          render();
+          showToast("Dados baixados da nuvem.");
+        }
+        return true;
+      } catch (error) {
+        suppressCloudSync = false;
+        if (!options.silent) showToast(`Não foi possível baixar: ${error.message}`);
+        return false;
+      }
+    }
+
+    async function pushCloudState(options = {}) {
+      if (!isCloudLoggedIn()) return;
+      try {
+        await ensureCloudSession();
+        await cloudFetch("/rest/v1/locacao_app_state?on_conflict=user_id", {
+          method: "POST",
+          headers: { Prefer: "resolution=merge-duplicates,return=minimal" },
+          body: {
+            user_id: cloudConfig.userId,
+            payload: state,
+            updated_at: new Date().toISOString()
+          }
+        });
+        if (options.notify) showToast("Dados enviados para a nuvem.");
+      } catch (error) {
+        if (options.notify) showToast(`Não foi possível enviar: ${error.message}`);
+      }
+    }
+
+    function scheduleCloudSync() {
+      if (suppressCloudSync || !isCloudLoggedIn()) return;
+      clearTimeout(cloudSyncTimer);
+      cloudSyncTimer = setTimeout(() => pushCloudState(), 1400);
+    }
+
+    async function ensureCloudSession() {
+      if (!cloudConfig.url || !cloudConfig.anonKey) throw new Error("configure URL e chave anon");
+      if (!cloudConfig.accessToken || !cloudConfig.refreshToken) throw new Error("faça login primeiro");
+      if (Date.now() < Number(cloudConfig.expiresAt || 0)) return;
+      const result = await cloudFetch("/auth/v1/token?grant_type=refresh_token", {
+        method: "POST",
+        auth: false,
+        body: { refresh_token: cloudConfig.refreshToken }
+      });
+      cloudConfig.accessToken = result.access_token;
+      cloudConfig.refreshToken = result.refresh_token;
+      cloudConfig.expiresAt = Date.now() + Math.max(30, Number(result.expires_in || 3600) - 60) * 1000;
+      cloudConfig.userId = result.user?.id || cloudConfig.userId || "";
+      saveCloudConfig();
+    }
+
+    async function cloudFetch(path, options = {}) {
+      const url = `${cleanCloudUrl(cloudConfig.url)}${path}`;
+      const headers = {
+        apikey: cloudConfig.anonKey,
+        "Content-Type": "application/json",
+        ...(options.auth === false ? { Authorization: `Bearer ${cloudConfig.anonKey}` } : { Authorization: `Bearer ${cloudConfig.accessToken}` }),
+        ...(options.headers || {})
+      };
+      const response = await fetch(url, {
+        method: options.method || "GET",
+        headers,
+        body: options.body ? JSON.stringify(options.body) : undefined
+      });
+      const text = await response.text();
+      let data = null;
+      if (text) {
+        try { data = JSON.parse(text); }
+        catch { data = text; }
+      }
+      if (!response.ok) {
+        throw new Error(data?.message || data?.error_description || data?.hint || response.statusText || "erro online");
+      }
+      return data;
+    }
+
+    function cleanCloudUrl(url) {
+      return String(url || "").trim().replace(/\/+$/, "");
+    }
+
+    function isCloudLoggedIn() {
+      return Boolean(cloudConfig.url && cloudConfig.anonKey && cloudConfig.accessToken && cloudConfig.refreshToken && cloudConfig.userId);
+    }
+
+    function loadCloudConfig() {
+      try {
+        return JSON.parse(localStorage.getItem(CLOUD_CONFIG_KEY) || "{}");
+      } catch {
+        return {};
+      }
+    }
+
+    function saveCloudConfig() {
+      localStorage.setItem(CLOUD_CONFIG_KEY, JSON.stringify(cloudConfig));
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return clone(defaultState);
+        return normalizeState(JSON.parse(raw));
+      } catch {
+        return clone(defaultState);
+      }
+    }
+
+    function normalizeState(data) {
+      const fallback = clone(defaultState);
+      const settings = { ...fallback.settings, ...(data.settings || {}) };
+      if (!settings.company || settings.company === "A&F Locação") {
+        settings.company = "O Ponto da Locação";
+      }
+      if (!settings.slogan || settings.slogan === "A certeza de um lugar seguro!") {
+        settings.slogan = "Toda mudança merece um bom começo";
+      }
+      return {
+        version: APP_VERSION,
+        settings,
+        categories: unique([...(fallback.categories || []), ...arrayOrEmpty(data.categories)]),
+        descriptions: unique([...(fallback.descriptions || []), ...arrayOrEmpty(data.descriptions)]),
+        properties: Array.isArray(data.properties) ? data.properties : fallback.properties,
+        tenants: Array.isArray(data.tenants) ? data.tenants : fallback.tenants,
+        statements: data.statements && typeof data.statements === "object" ? data.statements : fallback.statements
+      };
+    }
+
+    function arrayOrEmpty(value) {
+      return Array.isArray(value) ? value : [];
+    }
+
+    function unique(values) {
+      const seen = new Set();
+      return values.filter((item) => {
+        const key = String(item || "").toLowerCase();
+        if (!key || seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+    }
+
+    function clone(value) {
+      return JSON.parse(JSON.stringify(value));
+    }
+
+    function save() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      scheduleCloudSync();
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("show");
+      clearTimeout(showToast.timer);
+      showToast.timer = setTimeout(() => toast.classList.remove("show"), 2600);
+    }
+  </script>
+</body>
+</html>
